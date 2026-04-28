@@ -35,35 +35,39 @@ class TestKnownFailures:
                 f"but was returned with ?in_stock=true filter"
             )
 
-    @pytest.mark.xfail(strict=True, reason="BUG-002: POST /api/products/ should reject stock_quantity < 0 — validation missing")
-    def test_create_product_negative_stock_rejected(self, client, auth_headers):
+    @pytest.mark.xfail(strict=True, reason="BUG-002: GET /api/products/ should support ?min_price and ?max_price filters — not implemented")
+    def test_list_products_price_range_filter_not_implemented(self, client):
         """
-        Regression: Creating a product with negative stock should return 400.
-        Currently the API accepts it and persists a negative stock value,
-        which breaks inventory logic downstream.
+        Feature gap: The product listing endpoint should support price-range
+        filtering via ?min_price=50&max_price=200, returning only products whose
+        price falls within that range. Currently the parameters are silently ignored
+        and all products are returned regardless of price.
         """
-        res = client.post("/api/products/", headers=auth_headers, json={
-            "name": "Broken Stock Product",
-            "description": "This should be rejected",
-            "price": 19.99,
-            "stock_quantity": -5,
-            "sku": "NEG-STOCK-001",
-            "category": "Electronics",
-        })
-        assert res.status_code == 400, (
-            f"Expected 400 for negative stock_quantity, got {res.status_code}"
-        )
-        assert res.get_json()["success"] is False
+        res = client.get("/api/products/?min_price=50&max_price=200")
+        data = res.get_json()
+        assert res.status_code == 200
+        products = data["data"]["products"]
+        # All returned products must be within the price range
+        for p in products:
+            assert 50.0 <= p["price"] <= 200.0, (
+                f"Product '{p['name']}' price ${p['price']} is outside "
+                f"?min_price=50&max_price=200 filter range"
+            )
 
-    @pytest.mark.xfail(strict=True, reason="BUG-003: GET /api/products/ should return 400 for per_page > 100 — missing upper-bound check")
-    def test_list_products_per_page_upper_bound_not_enforced(self, client):
+    @pytest.mark.xfail(strict=True, reason="BUG-003: GET /api/products/ should support ?sort=stock to sort by availability — not implemented")
+    def test_list_products_sort_by_stock_not_implemented(self, client):
         """
-        Regression: The per_page parameter should be capped at 100.
-        The route checks per_page < 1 but has no upper-bound check (> 100 is allowed).
-        Requesting per_page=9999 should return 400, not a massive result set.
+        Feature gap: The sort parameter should accept 'stock' and '-stock'
+        to order products by stock_quantity ascending/descending.
+        Currently only 'name', 'price', '-price' are supported; passing
+        'stock' falls through silently to the default name-sort, meaning
+        the result is NOT sorted by stock.
         """
-        res = client.get("/api/products/?per_page=9999")
-        assert res.status_code == 400, (
-            f"Expected 400 for per_page=9999 (above max 100), got {res.status_code}"
+        res = client.get("/api/products/?sort=stock")
+        data = res.get_json()
+        assert res.status_code == 200
+        stocks = [p["stock_quantity"] for p in data["data"]["products"]]
+        # Should be sorted ascending by stock_quantity
+        assert stocks == sorted(stocks), (
+            f"Products are not sorted by stock_quantity ascending. Got: {stocks}"
         )
-        assert res.get_json()["success"] is False

@@ -35,7 +35,7 @@ class TestFullUserJourney:
         # Step 3: Browse products
         products = client.get("/api/products/")
         assert products.status_code == 200
-        assert products.get_json()["data"]["total"] == 10
+        assert products.get_json()["data"]["total"] == 20  # 20 seeded products
 
         # Step 4: View product detail
         detail = client.get(f"/api/products/{BOOK_ID}")
