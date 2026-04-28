@@ -53,7 +53,9 @@ class BasePage:
     # ── Action helpers ────────────────────────────────────────────────────────
 
     def click(self, testid: str):
-        self.wait_for_clickable(testid).click()
+        el = self.wait_for_clickable(testid)
+        self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", el)
+        el.click()
 
     def type_text(self, testid: str, text: str, clear=True):
         el = self.wait_for_visible(testid)

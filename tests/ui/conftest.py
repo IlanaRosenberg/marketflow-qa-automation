@@ -83,16 +83,36 @@ def driver():
 def logged_in_driver(driver, live_app, base_url):
     """Driver with testuser1 already logged in (token set in localStorage).
 
-    Also clears the DB cart for testuser1 before every test so state from a
-    previous test cannot bleed through (the DB is session-scoped).
+    Before each test:
+    - Clears testuser1's cart in the DB
+    - Resets stock for products frequently used in UI tests so stock
+      depletion from prior checkout tests does not cause failures
     """
-    # Purge testuser1's cart in the DB directly so no stale items remain
     with live_app.app_context():
-        from app.models import User
+        from app.models import User, Product
         user = User.query.filter_by(email=TEST_USER["email"]).first()
         if user:
             CartItem.query.filter_by(user_id=user.id).delete()
-            _db.session.commit()
+
+        # Reset stock for products used in UI checkout/cart tests
+        # so each test starts with a known-good stock level
+        stock_resets = {
+            1: 10,   # Laptop Pro
+            2: 50,   # Wireless Mouse
+            4: 5,    # Monitor
+            5: 20,   # Mechanical Keyboard
+            6: 15,   # Running Shoes
+            7: 30,   # Yoga Mat
+            8: 1,    # Coffee Maker (keep at 1 — low stock boundary)
+            11: 8,   # 4K Webcam
+            12: 12,  # Wireless Headphones
+        }
+        for pid, stock in stock_resets.items():
+            p = Product.query.get(pid)
+            if p:
+                p.stock_quantity = stock
+
+        _db.session.commit()
 
     driver.get(f"{base_url}/login")
     time.sleep(0.5)

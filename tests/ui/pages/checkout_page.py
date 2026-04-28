@@ -100,11 +100,18 @@ class CheckoutPage(BasePage):
             return False
 
     def submit_card_form(self):
-        """Submit the card form (Place Order button on step 2)."""
-        self.click("btn-place-order")
+        """Submit the card form via JS click on the submit button.
+
+        Selenium's WebElement.click() does not reliably fire the form 'submit'
+        event on all Chrome/chromedriver combinations. Using JS click is more
+        reliable because it goes through the browser's event loop the same way
+        a real user click does.
+        """
+        btn = self.wait_for_visible("btn-place-order")
+        self.driver.execute_script("arguments[0].click();", btn)
 
     def fill_and_submit_card(self, card_num: str, expiry: str, cvv: str):
-        """Fill card form and submit. Should be called after click_next_to_payment()."""
+        """Fill all card fields then submit. Call after click_next_to_payment()."""
         self.enter_card_number(card_num)
         self.enter_card_expiry(expiry)
         self.enter_card_cvv(cvv)

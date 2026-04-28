@@ -50,10 +50,18 @@ class ProductListPage(BasePage):
     def get_product_price(self, product_id: int) -> str:
         return self.get_text(f"product-price-{product_id}")
 
+    def _scroll_to(self, testid: str):
+        """Scroll element into view before interacting."""
+        el = self.wait_for(testid)
+        self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", el)
+        import time; time.sleep(0.2)
+
     def click_product_detail(self, product_id: int):
+        self._scroll_to(f"product-link-{product_id}")
         self.click(f"product-link-{product_id}")
 
     def click_add_to_cart(self, product_id: int):
+        self._scroll_to(f"btn-add-to-cart-{product_id}")
         self.click(f"btn-add-to-cart-{product_id}")
 
     def is_add_to_cart_enabled(self, product_id: int) -> bool:

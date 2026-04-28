@@ -18,20 +18,21 @@ def require_server(live_app):
 
 
 def add_product_via_api(driver, base_url, product_id, quantity=1):
-    """Helper: add product to cart using JS fetch (faster than UI)."""
-    script = f"""
-    const token = localStorage.getItem('marketflow_token');
-    return fetch('{base_url}/api/cart/add', {{
-        method: 'POST',
-        headers: {{'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token}},
-        body: JSON.stringify({{product_id: {product_id}, quantity: {quantity}}})
-    }}).then(r => r.json());
-    """
-    return driver.execute_async_script(
-        f"""
-        const cb = arguments[arguments.length - 1];
-        {script}.then(cb);
+    """Add product to cart via JS fetch. Uses execute_async_script callback pattern."""
+    driver.execute_async_script(
         """
+        const cb = arguments[arguments.length - 1];
+        const base_url = arguments[0];
+        const product_id = arguments[1];
+        const quantity = arguments[2];
+        const token = localStorage.getItem('marketflow_token');
+        fetch(base_url + '/api/cart/add', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token},
+            body: JSON.stringify({product_id: product_id, quantity: quantity})
+        }).then(r => r.json()).then(cb).catch(cb);
+        """,
+        base_url, product_id, quantity
     )
 
 

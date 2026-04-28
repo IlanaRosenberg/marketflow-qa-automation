@@ -7,7 +7,7 @@
     "stock_quantity": 10,
     "sku": "LAPTOP-001",
     "category": "Electronics",
-    "image_url": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=300&fit=crop"
+    "image_url": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=300&fit=crop&auto=format"
   },
   {
     "id": 2,
@@ -17,7 +17,7 @@
     "stock_quantity": 50,
     "sku": "MOUSE-001",
     "category": "Electronics",
-    "image_url": "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&h=300&fit=crop"
+    "image_url": "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&h=300&fit=crop&auto=format"
   },
   {
     "id": 3,
@@ -27,7 +27,7 @@
     "stock_quantity": 0,
     "sku": "CABLE-001",
     "category": "Electronics",
-    "image_url": "https://images.unsplash.com/photo-1601524909162-ae8725290836?w=400&h=300&fit=crop"
+    "image_url": "https://images.unsplash.com/photo-1601524909162-ae8725290836?w=400&h=300&fit=crop&auto=format"
   },
   {
     "id": 4,
@@ -37,7 +37,7 @@
     "stock_quantity": 5,
     "sku": "MONITOR-001",
     "category": "Electronics",
-    "image_url": "https://images.unsplash.com/photo-1527443224154-c4a573d5f5fa?w=400&h=300&fit=crop"
+    "image_url": "https://images.unsplash.com/photo-1527443224154-c4a573d5f5fa?w=400&h=300&fit=crop&auto=format"
   },
   {
     "id": 5,
@@ -47,7 +47,7 @@
     "stock_quantity": 20,
     "sku": "KEYBOARD-001",
     "category": "Electronics",
-    "image_url": "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&h=300&fit=crop"
+    "image_url": "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&h=300&fit=crop&auto=format"
   },
   {
     "id": 6,
@@ -57,7 +57,7 @@
     "stock_quantity": 15,
     "sku": "SHOES-001",
     "category": "Sports",
-    "image_url": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=300&fit=crop"
+    "image_url": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=300&fit=crop&auto=format"
   },
   {
     "id": 7,
@@ -67,7 +67,7 @@
     "stock_quantity": 30,
     "sku": "YOGA-001",
     "category": "Sports",
-    "image_url": "https://images.unsplash.com/photo-1601925228897-fb36d5e44a1b?w=400&h=300&fit=crop"
+    "image_url": "https://images.unsplash.com/photo-1601925228897-fb36d5e44a1b?w=400&h=300&fit=crop&auto=format"
   },
   {
     "id": 8,
@@ -77,7 +77,7 @@
     "stock_quantity": 1,
     "sku": "COFFEE-001",
     "category": "Kitchen",
-    "image_url": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop"
+    "image_url": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop&auto=format"
   },
   {
     "id": 9,
@@ -87,7 +87,7 @@
     "stock_quantity": 100,
     "sku": "BOOK-001",
     "category": "Books",
-    "image_url": "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=400&h=300&fit=crop"
+    "image_url": "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=400&h=300&fit=crop&auto=format"
   },
   {
     "id": 10,
@@ -97,7 +97,7 @@
     "stock_quantity": 0,
     "sku": "LAMP-001",
     "category": "Home",
-    "image_url": "https://images.unsplash.com/photo-1573297888476-c09b27e2b35b?w=400&h=300&fit=crop"
+    "image_url": "https://images.unsplash.com/photo-1573297888476-c09b27e2b35b?w=400&h=300&fit=crop&auto=format"
   },
   {
     "id": 11,
@@ -107,7 +107,7 @@
     "stock_quantity": 8,
     "sku": "WEBCAM-001",
     "category": "Electronics",
-    "image_url": "https://images.unsplash.com/photo-1587614382346-4ec70e388b28?w=400&h=300&fit=crop"
+    "image_url": "https://images.unsplash.com/photo-1587614382346-4ec70e388b28?w=400&h=300&fit=crop&auto=format"
   },
   {
     "id": 12,
@@ -117,7 +117,7 @@
     "stock_quantity": 12,
     "sku": "HEADPHONES-001",
     "category": "Electronics",
-    "image_url": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop"
+    "image_url": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop&auto=format"
   },
   {
     "id": 13,
@@ -127,7 +127,7 @@
     "stock_quantity": 25,
     "sku": "USBHUB-001",
     "category": "Electronics",
-    "image_url": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop"
+    "image_url": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop&auto=format"
   },
   {
     "id": 14,
@@ -137,7 +137,7 @@
     "stock_quantity": 35,
     "sku": "CHARGER-001",
     "category": "Electronics",
-    "image_url": "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400&h=300&fit=crop"
+    "image_url": "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400&h=300&fit=crop&auto=format"
   },
   {
     "id": 15,
@@ -147,7 +147,7 @@
     "stock_quantity": 0,
     "sku": "MOUSEPAD-001",
     "category": "Electronics",
-    "image_url": "https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=400&h=300&fit=crop"
+    "image_url": "https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=400&h=300&fit=crop&auto=format"
   },
   {
     "id": 16,
@@ -157,7 +157,7 @@
     "stock_quantity": 6,
     "sku": "STAND-DESK-001",
     "category": "Home",
-    "image_url": "https://images.unsplash.com/photo-1593642634315-48f5414c3ad9?w=400&h=300&fit=crop"
+    "image_url": "https://images.unsplash.com/photo-1593642634315-48f5414c3ad9?w=400&h=300&fit=crop&auto=format"
   },
   {
     "id": 17,
@@ -167,7 +167,7 @@
     "stock_quantity": 9,
     "sku": "CHAIR-001",
     "category": "Home",
-    "image_url": "https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=400&h=300&fit=crop"
+    "image_url": "https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=400&h=300&fit=crop&auto=format"
   },
   {
     "id": 18,
@@ -177,7 +177,7 @@
     "stock_quantity": 18,
     "sku": "MONITOR-ARM-001",
     "category": "Home",
-    "image_url": "https://images.unsplash.com/photo-1616588589676-62b3bd4ff6d2?w=400&h=300&fit=crop"
+    "image_url": "https://images.unsplash.com/photo-1616588589676-62b3bd4ff6d2?w=400&h=300&fit=crop&auto=format"
   },
   {
     "id": 19,
@@ -187,7 +187,7 @@
     "stock_quantity": 50,
     "sku": "PROTECTOR-001",
     "category": "Electronics",
-    "image_url": "https://images.unsplash.com/photo-1592303637753-ce1e6b8a0ffb?w=400&h=300&fit=crop"
+    "image_url": "https://images.unsplash.com/photo-1592303637753-ce1e6b8a0ffb?w=400&h=300&fit=crop&auto=format"
   },
   {
     "id": 20,
@@ -197,6 +197,6 @@
     "stock_quantity": 22,
     "sku": "LAPTOP-STAND-001",
     "category": "Home",
-    "image_url": "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=400&h=300&fit=crop"
+    "image_url": "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=400&h=300&fit=crop&auto=format"
   }
 ]

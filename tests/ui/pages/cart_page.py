@@ -1,3 +1,7 @@
+import time
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from .base_page import BasePage
 
 
@@ -7,6 +11,11 @@ class CartPage(BasePage):
     def open(self):
         self.navigate(self.URL)
         self.wait_for_visible("page-cart")
+        # Wait for the async loadCart() to finish: spinner hides, cart-content appears.
+        WebDriverWait(self.driver, 10).until(
+            EC.invisibility_of_element_located((By.ID, "loading-spinner"))
+        )
+        time.sleep(0.3)
         return self
 
     def get_item_count(self) -> int:

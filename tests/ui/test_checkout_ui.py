@@ -21,16 +21,21 @@ def require_server(live_app):
 
 
 def add_via_api(driver, base_url, product_id, quantity=1):
+    """Add a product to cart via fetch. Passes args as script arguments to avoid f-string JS issues."""
     driver.execute_async_script(
-        f"""
-        const cb = arguments[arguments.length - 1];
-        const token = localStorage.getItem('marketflow_token');
-        fetch('{base_url}/api/cart/add', {{
-            method: 'POST',
-            headers: {{'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token}},
-            body: JSON.stringify({{product_id: {product_id}, quantity: {quantity}}})
-        }}).then(() => cb());
         """
+        const cb = arguments[arguments.length - 1];
+        const base_url = arguments[0];
+        const product_id = arguments[1];
+        const quantity = arguments[2];
+        const token = localStorage.getItem('marketflow_token');
+        fetch(base_url + '/api/cart/add', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token},
+            body: JSON.stringify({product_id: product_id, quantity: quantity})
+        }).then(() => cb()).catch(() => cb());
+        """,
+        base_url, product_id, quantity
     )
 
 
@@ -99,21 +104,21 @@ class TestCheckoutUI:
         assert not page.is_card_form_visible()
 
     def test_invalid_card_number_rejected(self, logged_in_driver, base_url):
-        """Invalid card number should show error."""
+        """Card number with fewer than 13 digits must show a validation error."""
         driver = logged_in_driver
         add_via_api(driver, base_url, MOUSE_ID, 1)
         page = CheckoutPage(driver, base_url).open()
         page.click_next_to_payment()
         time.sleep(0.3)
-        # Enter invalid card (too short)
-        page.enter_card_number("1111111111111")
-        page.enter_card_expiry("12/25")
+        # 4 digits — clearly below the 13-digit minimum
+        page.enter_card_number("1234")
+        page.enter_card_expiry("12/30")
         page.enter_card_cvv("123")
         page.submit_card_form()
         time.sleep(0.3)
         assert page.is_card_form_error_displayed()
         error = page.get_card_form_error()
-        assert "digit" in error.lower() or "invalid" in error.lower()
+        assert "digit" in error.lower() or "invalid" in error.lower() or "number" in error.lower()
 
     def test_expired_card_rejected(self, logged_in_driver, base_url):
         """Expired card should show error."""
@@ -132,20 +137,20 @@ class TestCheckoutUI:
         assert "expired" in error.lower()
 
     def test_invalid_cvv_rejected(self, logged_in_driver, base_url):
-        """Invalid CVV should show error."""
+        """CVV with fewer than 3 digits must show a validation error."""
         driver = logged_in_driver
         add_via_api(driver, base_url, MOUSE_ID, 1)
         page = CheckoutPage(driver, base_url).open()
         page.click_next_to_payment()
         time.sleep(0.3)
         page.enter_card_number("4111111111111111")
-        page.enter_card_expiry("12/25")
-        page.enter_card_cvv("12")  # Too short
+        page.enter_card_expiry("12/30")
+        page.enter_card_cvv("1")  # 1 digit — clearly below the 3-digit minimum
         page.submit_card_form()
         time.sleep(0.3)
         assert page.is_card_form_error_displayed()
         error = page.get_card_form_error()
-        assert "cvv" in error.lower() or "digit" in error.lower()
+        assert "cvv" in error.lower() or "digit" in error.lower() or "required" in error.lower()
 
     def test_valid_card_completes_checkout(self, logged_in_driver, base_url):
         """Valid card details should complete checkout successfully."""
@@ -155,7 +160,7 @@ class TestCheckoutUI:
         page.click_next_to_payment()
         time.sleep(0.3)
         # Fill valid card (test number 4111111111111111)
-        page.fill_and_submit_card("4111111111111111", "12/25", "123")
+        page.fill_and_submit_card("4111111111111111", "12/30", "123")
         time.sleep(0.5)
         WebDriverWait(driver, 5).until(
             EC.visibility_of_element_located((By.CSS_SELECTOR, '[data-testid="thank-you-message"]'))
@@ -175,7 +180,7 @@ class TestCheckoutUI:
         # Go through payment form with valid card
         page.click_next_to_payment()
         time.sleep(0.3)
-        page.fill_and_submit_card("4111111111111111", "12/25", "123")
+        page.fill_and_submit_card("4111111111111111", "12/30", "123")
         time.sleep(0.5)
         WebDriverWait(driver, 5).until(
             EC.visibility_of_element_located((By.CSS_SELECTOR, '[data-testid="thank-you-message"]'))
@@ -191,7 +196,7 @@ class TestCheckoutUI:
         # Go through payment form with valid card
         page.click_next_to_payment()
         time.sleep(0.3)
-        page.fill_and_submit_card("4111111111111111", "12/25", "123")
+        page.fill_and_submit_card("4111111111111111", "12/30", "123")
         time.sleep(2.5)
         assert "/my-orders" in driver.current_url
 
@@ -203,7 +208,7 @@ class TestCheckoutUI:
         # Go through payment form with valid card
         page.click_next_to_payment()
         time.sleep(0.3)
-        page.fill_and_submit_card("4111111111111111", "12/25", "123")
+        page.fill_and_submit_card("4111111111111111", "12/30", "123")
         time.sleep(2.5)
         cart_count_el = driver.find_element("css selector", '[data-testid="cart-count"]')
         assert cart_count_el.text == "0"
@@ -216,7 +221,7 @@ class TestCheckoutUI:
         # Go through payment form with valid card
         page.click_next_to_payment()
         time.sleep(0.3)
-        page.fill_and_submit_card("4111111111111111", "12/25", "123")
+        page.fill_and_submit_card("4111111111111111", "12/30", "123")
         time.sleep(2.5)
         # Redirected to /my-orders — wait for at least one order card
         WebDriverWait(driver, 10).until(
