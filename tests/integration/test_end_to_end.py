@@ -4,6 +4,7 @@ Full user journeys: register → login → browse → cart → checkout → orde
 These tests exercise the entire stack through the API client.
 """
 import pytest
+import allure
 
 pytestmark = [pytest.mark.integration, pytest.mark.sanity, pytest.mark.regression]
 
@@ -12,7 +13,11 @@ MOUSE_ID = 2       # Wireless Mouse: $29.99, stock=50
 BOOK_ID = 9        # Book: $14.99, stock=100
 
 
+@allure.feature("End-to-End Flows")
+@allure.story("Full User Journey")
 class TestFullUserJourney:
+    @allure.title("Full journey: register → login → browse → cart → checkout → history")
+    @allure.severity(allure.severity_level.BLOCKER)
     def test_register_login_browse_cart_checkout(self, client):
         """Full happy path: new user → register → login → add to cart → checkout → view order."""
         # Step 1: Register

@@ -159,23 +159,59 @@ pytest tests/api/test_cart_api.py::TestAddToCart::test_add_to_cart_success -v
 
 ## Allure Reports
 
-### Install Allure CLI
+Allure is fully integrated. Every test run automatically generates results in `allure-results/` (configured in `pytest.ini`). The report organises tests by **Feature** and **Story**, shows severity levels (Blocker → Minor), and surfaces open bugs as **XFAIL**.
 
-- **Windows** (via Scoop): `scoop install allure`
-- **Mac**: `brew install allure`
-- **Manual**: download from https://github.com/allure-framework/allure2/releases
+### 1. Install Allure CLI (one-time setup)
 
-### Generate & open report
+| OS | Command |
+|----|---------|
+| Windows (Scoop) | `scoop install allure` |
+| macOS (Homebrew) | `brew install allure` |
+| Manual | Download from [allure2 releases](https://github.com/allure-framework/allure2/releases), unzip, add `bin/` to PATH |
+
+Verify: `allure --version`
+
+### 2. Run tests (results generated automatically)
 
 ```bash
-# Run tests and collect results
-pytest tests/api/ tests/integration/ --alluredir=allure-results
+# API + integration
+pytest tests/api/ tests/integration/ -v
 
-# Open the report (starts a local server)
+# UI tests
+pytest tests/ui/ -v
+
+# Everything at once
+pytest -v
+```
+
+`pytest.ini` already includes `--alluredir=allure-results --clean-alluredir`, so results are refreshed on every run. No extra flags needed.
+
+### 3. View the report
+
+```bash
+# Launch a local server and open the report in your browser
 allure serve allure-results
 ```
 
-The report shows passed, failed, and **XFAIL** tests (open bugs tracked in `test_known_failures.py`).
+Or generate a static HTML report:
+
+```bash
+allure generate allure-results -o allure-report --clean
+allure open allure-report
+```
+
+### What you will see in the report
+
+| Section | What it shows |
+|---------|--------------|
+| **Suites** | Tests grouped by file and class |
+| **Features / Stories** | Tests grouped by `@allure.feature` / `@allure.story` (e.g. Authentication → Login) |
+| **Severity** | Blocker · Critical · Normal · Minor per test |
+| **Behaviors** | Full user-story traceability view |
+| **XFAIL (broken)** | BUG-001, BUG-002, BUG-003 — open bugs visible on the dashboard |
+| **Timeline** | Execution order and duration per test |
+
+> `allure-results/` and `allure-report/` are in `.gitignore` and are never committed.
 
 ---
 
@@ -224,8 +260,8 @@ Three tests in `tests/api/test_known_failures.py` are intentionally marked `xfai
 | Bug ID | Description |
 |--------|-------------|
 | BUG-001 | `?in_stock=true` filter not implemented — out-of-stock products leak through |
-| BUG-002 | `stock_quantity < 0` not rejected by POST /api/products/ |
-| BUG-003 | `per_page > 100` not rejected — upper-bound validation missing |
+| BUG-002 | `?min_price` / `?max_price` range filter not implemented — all products returned |
+| BUG-003 | `?sort=stock` not implemented — silently falls back to name sort |
 
 ---
 

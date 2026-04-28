@@ -6,18 +6,24 @@ KNOWN FAILURES (orange) rather than blocking the suite. Each one documents
 a real gap between the API spec and the current implementation.
 """
 import pytest
+import allure
 
 pytestmark = pytest.mark.api
 
 
+@allure.feature("Products")
+@allure.story("Known Failures — Unimplemented Features")
 class TestKnownFailures:
     """
     Three intentional failures that represent real open bugs.
-    They show up in Allure as FAILED / XFAIL so the team can see
+    They show up in Allure as XFAIL so the team can track
     what is not yet implemented.
     """
 
     @pytest.mark.xfail(strict=True, reason="BUG-001: GET /api/products/ should support ?in_stock=true filter — not yet implemented")
+    @allure.title("[BUG-001] ?in_stock=true filter is not implemented")
+    @allure.severity(allure.severity_level.NORMAL)
+    @allure.label("bug_id", "BUG-001")
     def test_list_products_in_stock_filter_not_implemented(self, client):
         """
         Regression: The product listing endpoint should support filtering
@@ -36,6 +42,9 @@ class TestKnownFailures:
             )
 
     @pytest.mark.xfail(strict=True, reason="BUG-002: GET /api/products/ should support ?min_price and ?max_price filters — not implemented")
+    @allure.title("[BUG-002] ?min_price / ?max_price range filter is not implemented")
+    @allure.severity(allure.severity_level.NORMAL)
+    @allure.label("bug_id", "BUG-002")
     def test_list_products_price_range_filter_not_implemented(self, client):
         """
         Feature gap: The product listing endpoint should support price-range
@@ -55,6 +64,9 @@ class TestKnownFailures:
             )
 
     @pytest.mark.xfail(strict=True, reason="BUG-003: GET /api/products/ should support ?sort=stock to sort by availability — not implemented")
+    @allure.title("[BUG-003] ?sort=stock sorting is not implemented")
+    @allure.severity(allure.severity_level.MINOR)
+    @allure.label("bug_id", "BUG-003")
     def test_list_products_sort_by_stock_not_implemented(self, client):
         """
         Feature gap: The sort parameter should accept 'stock' and '-stock'

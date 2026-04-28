@@ -2,6 +2,7 @@
 UI tests for the checkout flow.
 """
 import pytest
+import allure
 import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -39,7 +40,11 @@ def add_via_api(driver, base_url, product_id, quantity=1):
     )
 
 
+@allure.feature("Checkout")
+@allure.story("Checkout UI")
 class TestCheckoutUI:
+    @allure.title("Checkout page displays order summary with correct item")
+    @allure.severity(allure.severity_level.CRITICAL)
     def test_checkout_displays_order_summary(self, logged_in_driver, base_url):
         driver = logged_in_driver
         add_via_api(driver, base_url, IN_STOCK_ID, 1)
@@ -172,6 +177,8 @@ class TestCheckoutUI:
 
     @pytest.mark.smoke
     @pytest.mark.sanity
+    @allure.title("Successful checkout shows thank-you banner")
+    @allure.severity(allure.severity_level.BLOCKER)
     def test_place_order_shows_thank_you_banner(self, logged_in_driver, base_url):
         """Original test updated for multi-step payment form."""
         driver = logged_in_driver

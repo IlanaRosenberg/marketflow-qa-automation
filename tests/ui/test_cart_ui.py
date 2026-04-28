@@ -2,6 +2,7 @@
 UI tests for the cart page.
 """
 import pytest
+import allure
 import time
 from tests.ui.pages.cart_page import CartPage
 from tests.ui.pages.product_list_page import ProductListPage
@@ -36,7 +37,11 @@ def add_product_via_api(driver, base_url, product_id, quantity=1):
     )
 
 
+@allure.feature("Cart")
+@allure.story("Cart UI")
 class TestCartUI:
+    @allure.title("Empty cart displays empty state message")
+    @allure.severity(allure.severity_level.NORMAL)
     def test_empty_cart_shows_empty_message(self, logged_in_driver, base_url):
         driver = logged_in_driver
         page = CartPage(driver, base_url).open()
@@ -44,6 +49,8 @@ class TestCartUI:
 
     @pytest.mark.smoke
     @pytest.mark.sanity
+    @allure.title("Added product appears in cart")
+    @allure.severity(allure.severity_level.BLOCKER)
     def test_add_product_appears_in_cart(self, logged_in_driver, base_url):
         driver = logged_in_driver
         add_product_via_api(driver, base_url, IN_STOCK_ID, 1)

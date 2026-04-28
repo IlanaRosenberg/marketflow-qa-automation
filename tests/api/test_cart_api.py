@@ -3,6 +3,7 @@ API tests for cart endpoints.
 Bug-catching focus: exact count/total assertions, stock validation, deduplication.
 """
 import pytest
+import allure
 
 pytestmark = [pytest.mark.api, pytest.mark.regression]
 
@@ -12,9 +13,13 @@ OUT_OF_STOCK_ID = 3  # USB-C Cable: stock=0
 LOW_STOCK_ID = 8     # Coffee Maker: stock=1
 
 
+@allure.feature("Cart")
+@allure.story("View Cart")
 class TestGetCart:
     @pytest.mark.smoke
     @pytest.mark.sanity
+    @allure.title("Empty cart returns items=[] and total=0")
+    @allure.severity(allure.severity_level.CRITICAL)
     def test_get_empty_cart(self, client, auth_headers):
         res = client.get("/api/cart/", headers=auth_headers)
         data = res.get_json()
@@ -29,9 +34,13 @@ class TestGetCart:
         assert res.status_code == 401
 
 
+@allure.feature("Cart")
+@allure.story("Add to Cart")
 class TestAddToCart:
     @pytest.mark.smoke
     @pytest.mark.sanity
+    @allure.title("Add in-stock product to cart succeeds")
+    @allure.severity(allure.severity_level.BLOCKER)
     def test_add_to_cart_success(self, client, auth_headers):
         res = client.post("/api/cart/add", headers=auth_headers,
                           json={"product_id": IN_STOCK_ID, "quantity": 2})
@@ -109,6 +118,8 @@ class TestAddToCart:
         assert data["item_count"] == 2
 
 
+@allure.feature("Cart")
+@allure.story("Update Cart Item")
 class TestUpdateCartItem:
     def test_update_quantity_success(self, client, auth_headers):
         client.post("/api/cart/add", headers=auth_headers,
@@ -143,6 +154,8 @@ class TestUpdateCartItem:
         assert res.status_code == 404
 
 
+@allure.feature("Cart")
+@allure.story("Remove Cart Item")
 class TestRemoveCartItem:
     def test_remove_item_success(self, client, auth_headers):
         client.post("/api/cart/add", headers=auth_headers,
@@ -166,6 +179,8 @@ class TestRemoveCartItem:
         assert res.status_code == 401
 
 
+@allure.feature("Cart")
+@allure.story("Clear Cart")
 class TestClearCart:
     def test_clear_cart_success(self, client, auth_headers):
         client.post("/api/cart/add", headers=auth_headers,

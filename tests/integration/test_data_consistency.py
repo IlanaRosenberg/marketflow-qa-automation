@@ -3,6 +3,7 @@ Cross-layer data consistency tests.
 Validates that API state matches DB state and business rules hold across operations.
 """
 import pytest
+import allure
 
 pytestmark = [pytest.mark.integration, pytest.mark.regression]
 
@@ -11,6 +12,8 @@ MOUSE_ID = 2       # Wireless Mouse: $29.99, stock=50
 BOOK_ID = 9        # Book: $14.99, stock=100
 
 
+@allure.feature("Data Consistency")
+@allure.story("Cart Consistency")
 class TestCartConsistency:
     def test_api_cart_matches_db_cart(self, client, auth_headers, app):
         """Cart returned by API must match CartItem rows in the database."""
@@ -44,6 +47,8 @@ class TestCartConsistency:
         assert len(items) == 0
 
 
+@allure.feature("Data Consistency")
+@allure.story("Order Consistency")
 class TestOrderConsistency:
     def test_order_total_matches_cart_total_before_checkout(self, client, auth_headers):
         """Order total in DB must exactly match cart total before checkout."""
@@ -143,6 +148,8 @@ class TestOrderConsistency:
             assert order.status == "cancelled"
 
 
+@allure.feature("Data Consistency")
+@allure.story("Product Search Consistency")
 class TestProductSearchConsistency:
     def test_search_api_count_matches_result_length(self, client):
         """The 'total' field in search results must match len(products)."""

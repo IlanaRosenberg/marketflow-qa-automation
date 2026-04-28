@@ -2,6 +2,7 @@
 UI tests for product list and product detail pages.
 """
 import pytest
+import allure
 import time
 from tests.ui.pages.product_list_page import ProductListPage
 from tests.ui.pages.product_detail_page import ProductDetailPage
@@ -17,6 +18,8 @@ def require_server(live_app):
     pass
 
 
+@allure.feature("Products")
+@allure.story("Product List UI")
 class TestProductListUI:
     def test_products_page_displays_products(self, driver, base_url):
         page = ProductListPage(driver, base_url).open()
@@ -84,6 +87,8 @@ class TestProductListUI:
         assert after == before + 1
 
 
+@allure.feature("Products")
+@allure.story("Product Detail UI")
 class TestProductDetailUI:
     def test_product_detail_page_displays_info(self, driver, base_url):
         page = ProductDetailPage(driver, base_url).open(IN_STOCK_ID)

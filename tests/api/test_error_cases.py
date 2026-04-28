@@ -3,12 +3,15 @@ Edge case and error handling tests.
 Validates consistent error response format and boundary conditions.
 """
 import pytest
+import allure
 import jwt
 import time
 
 pytestmark = [pytest.mark.api, pytest.mark.regression]
 
 
+@allure.feature("API Contract")
+@allure.story("Response Format")
 class TestResponseFormat:
     def test_error_response_has_required_fields(self, client):
         """All error responses must have success=false, data=null, error=string."""
@@ -32,6 +35,8 @@ class TestResponseFormat:
         assert data["error"] is None
 
 
+@allure.feature("API Contract")
+@allure.story("Malformed Requests")
 class TestMalformedRequests:
     def test_malformed_json_register(self, client):
         res = client.post(
@@ -56,6 +61,8 @@ class TestMalformedRequests:
         assert res.status_code == 400
 
 
+@allure.feature("Authentication")
+@allure.story("JWT Security")
 class TestJWTEdgeCases:
     def test_expired_jwt_token(self, client, app):
         """An expired token must return 401."""
@@ -87,6 +94,8 @@ class TestJWTEdgeCases:
         assert res.status_code == 401
 
 
+@allure.feature("API Contract")
+@allure.story("Boundary Conditions")
 class TestBoundaryConditions:
     def test_product_id_zero(self, client):
         res = client.get("/api/products/0")

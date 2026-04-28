@@ -3,6 +3,7 @@ API tests for order endpoints.
 Bug-catching focus: stock decremented after checkout, cart cleared, cancel validation.
 """
 import pytest
+import allure
 
 pytestmark = [pytest.mark.api, pytest.mark.regression]
 
@@ -22,9 +23,13 @@ def _checkout(client, headers, payment_method="credit_card"):
                        json={"payment_method": payment_method})
 
 
+@allure.feature("Orders")
+@allure.story("Checkout")
 class TestCheckout:
     @pytest.mark.smoke
     @pytest.mark.sanity
+    @allure.title("Checkout creates a completed order with correct total")
+    @allure.severity(allure.severity_level.BLOCKER)
     def test_checkout_success(self, client, auth_headers):
         _add_to_cart(client, auth_headers, IN_STOCK_ID, 1)
         res = _checkout(client, auth_headers)
@@ -86,6 +91,8 @@ class TestCheckout:
         assert MOUSE_ID in product_ids
 
 
+@allure.feature("Orders")
+@allure.story("Order History")
 class TestListOrders:
     def test_list_orders_empty(self, client, auth_headers):
         res = client.get("/api/orders/", headers=auth_headers)
@@ -127,6 +134,8 @@ class TestListOrders:
         assert res.get_json()["data"]["total"] == 0
 
 
+@allure.feature("Orders")
+@allure.story("Order Detail")
 class TestGetOrderDetail:
     def test_get_order_detail_success(self, client, auth_headers):
         _add_to_cart(client, auth_headers, IN_STOCK_ID, 1)
@@ -156,6 +165,8 @@ class TestGetOrderDetail:
         assert res.status_code == 401
 
 
+@allure.feature("Orders")
+@allure.story("Cancel Order")
 class TestCancelOrder:
     def _create_pending_order(self, client, headers):
         """Helper: create a pending order directly in the DB via app context."""

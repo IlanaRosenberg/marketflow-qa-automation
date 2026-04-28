@@ -3,6 +3,7 @@ UI tests for authentication flows (login, register, logout).
 Uses Page Object Model with data-testid locators.
 """
 import pytest
+import allure
 import time
 from tests.ui.pages.login_page import LoginPage
 from tests.ui.pages.register_page import RegisterPage
@@ -18,13 +19,19 @@ def require_server(live_app):
     pass
 
 
+@allure.feature("Authentication")
+@allure.story("Login UI")
 class TestLoginUI:
+    @allure.title("Login page displays the login form")
+    @allure.severity(allure.severity_level.NORMAL)
     def test_login_form_is_displayed(self, driver, base_url):
         page = LoginPage(driver, base_url).open()
         assert page.is_login_form_displayed()
 
     @pytest.mark.smoke
     @pytest.mark.sanity
+    @allure.title("Valid login redirects to home page")
+    @allure.severity(allure.severity_level.BLOCKER)
     def test_login_success_redirects_to_home(self, driver, base_url):
         page = LoginPage(driver, base_url).open()
         page.login(VALID_EMAIL, VALID_PASSWORD)
@@ -68,6 +75,8 @@ class TestLoginUI:
         assert "/register" in driver.current_url
 
 
+@allure.feature("Authentication")
+@allure.story("Register UI")
 class TestRegisterUI:
     def test_register_success_redirects_to_login(self, driver, base_url):
         page = RegisterPage(driver, base_url).open()

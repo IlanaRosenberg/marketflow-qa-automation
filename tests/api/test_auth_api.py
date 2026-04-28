@@ -3,13 +3,17 @@ API tests for authentication endpoints.
 Covers: register, login, logout, /me
 """
 import pytest
-
+import allure
 
 pytestmark = [pytest.mark.api, pytest.mark.regression]
 
 
+@allure.feature("Authentication")
+@allure.story("User Registration")
 class TestRegister:
     @pytest.mark.sanity
+    @allure.title("Register new user successfully")
+    @allure.severity(allure.severity_level.CRITICAL)
     def test_register_success(self, client):
         res = client.post("/api/auth/register", json={
             "username": "newuser",
@@ -26,6 +30,8 @@ class TestRegister:
         assert "id" in data["data"]
         assert data["error"] is None
 
+    @allure.title("Register with duplicate username returns 400")
+    @allure.severity(allure.severity_level.NORMAL)
     def test_register_duplicate_username(self, client):
         res = client.post("/api/auth/register", json={
             "username": "testuser1",
@@ -37,6 +43,8 @@ class TestRegister:
         assert data["success"] is False
         assert "username" in data["error"].lower()
 
+    @allure.title("Register with duplicate email returns 400")
+    @allure.severity(allure.severity_level.NORMAL)
     def test_register_duplicate_email(self, client):
         res = client.post("/api/auth/register", json={
             "username": "uniqueuser",
@@ -48,6 +56,8 @@ class TestRegister:
         assert data["success"] is False
         assert "email" in data["error"].lower()
 
+    @allure.title("Register without username returns 400")
+    @allure.severity(allure.severity_level.MINOR)
     def test_register_missing_username(self, client):
         res = client.post("/api/auth/register", json={
             "email": "a@b.com",
@@ -56,6 +66,8 @@ class TestRegister:
         assert res.status_code == 400
         assert res.get_json()["success"] is False
 
+    @allure.title("Register with invalid email format returns 400")
+    @allure.severity(allure.severity_level.MINOR)
     def test_register_invalid_email(self, client):
         res = client.post("/api/auth/register", json={
             "username": "someone",
@@ -65,6 +77,8 @@ class TestRegister:
         assert res.status_code == 400
         assert res.get_json()["success"] is False
 
+    @allure.title("Register with short password returns 400")
+    @allure.severity(allure.severity_level.MINOR)
     def test_register_short_password(self, client):
         res = client.post("/api/auth/register", json={
             "username": "someone",
@@ -75,9 +89,13 @@ class TestRegister:
         assert res.get_json()["success"] is False
 
 
+@allure.feature("Authentication")
+@allure.story("User Login")
 class TestLogin:
     @pytest.mark.smoke
     @pytest.mark.sanity
+    @allure.title("Login with valid credentials returns JWT token")
+    @allure.severity(allure.severity_level.BLOCKER)
     def test_login_success(self, client):
         res = client.post("/api/auth/login", json={
             "email": "testuser1@example.com",
@@ -90,6 +108,8 @@ class TestLogin:
         assert data["data"]["username"] == "testuser1"
         assert data["data"]["user_id"] is not None
 
+    @allure.title("Login with wrong password returns 401")
+    @allure.severity(allure.severity_level.CRITICAL)
     def test_login_wrong_password(self, client):
         res = client.post("/api/auth/login", json={
             "email": "testuser1@example.com",
@@ -100,6 +120,8 @@ class TestLogin:
         assert data["success"] is False
         assert data["data"] is None
 
+    @allure.title("Login with non-existent user returns 401")
+    @allure.severity(allure.severity_level.NORMAL)
     def test_login_nonexistent_user(self, client):
         res = client.post("/api/auth/login", json={
             "email": "ghost@example.com",
@@ -108,36 +130,52 @@ class TestLogin:
         assert res.status_code == 401
         assert res.get_json()["success"] is False
 
+    @allure.title("Login without email field returns 400")
+    @allure.severity(allure.severity_level.MINOR)
     def test_login_missing_email(self, client):
         res = client.post("/api/auth/login", json={"password": "Password123!"})
         assert res.status_code == 400
         assert res.get_json()["success"] is False
 
+    @allure.title("Login without password field returns 400")
+    @allure.severity(allure.severity_level.MINOR)
     def test_login_missing_password(self, client):
         res = client.post("/api/auth/login", json={"email": "testuser1@example.com"})
         assert res.status_code == 400
         assert res.get_json()["success"] is False
 
 
+@allure.feature("Authentication")
+@allure.story("Logout")
 class TestLogout:
+    @allure.title("Logout with valid token returns 200")
+    @allure.severity(allure.severity_level.NORMAL)
     def test_logout_success(self, client, auth_headers):
         res = client.post("/api/auth/logout", headers=auth_headers)
         assert res.status_code == 200
         assert res.get_json()["success"] is True
 
+    @allure.title("Logout without token returns 401")
+    @allure.severity(allure.severity_level.NORMAL)
     def test_logout_no_token(self, client):
         res = client.post("/api/auth/logout")
         assert res.status_code == 401
         assert res.get_json()["success"] is False
 
+    @allure.title("Logout with invalid token returns 401")
+    @allure.severity(allure.severity_level.MINOR)
     def test_logout_invalid_token(self, client):
         res = client.post("/api/auth/logout", headers={"Authorization": "Bearer fake.token.here"})
         assert res.status_code == 401
 
 
+@allure.feature("Authentication")
+@allure.story("Current User Profile")
 class TestGetMe:
     @pytest.mark.smoke
     @pytest.mark.sanity
+    @allure.title("GET /me returns authenticated user profile")
+    @allure.severity(allure.severity_level.CRITICAL)
     def test_get_me_authenticated(self, client, auth_headers):
         res = client.get("/api/auth/me", headers=auth_headers)
         data = res.get_json()
@@ -146,6 +184,8 @@ class TestGetMe:
         assert data["data"]["username"] == "testuser1"
         assert data["data"]["email"] == "testuser1@example.com"
 
+    @allure.title("GET /me without token returns 401")
+    @allure.severity(allure.severity_level.NORMAL)
     def test_get_me_unauthenticated(self, client):
         res = client.get("/api/auth/me")
         assert res.status_code == 401

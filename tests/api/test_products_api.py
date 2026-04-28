@@ -3,6 +3,7 @@ API tests for product endpoints.
 Covers: list, detail, create — including pagination, search, category filter, sort.
 """
 import pytest
+import allure
 
 pytestmark = [pytest.mark.api, pytest.mark.regression]
 
@@ -11,9 +12,13 @@ OUT_OF_STOCK_ID = 3  # USB-C Cable, stock=0
 BOOK_PRODUCT_ID = 9  # The QA Engineer Handbook, category=Books
 
 
+@allure.feature("Products")
+@allure.story("List Products")
 class TestListProducts:
     @pytest.mark.smoke
     @pytest.mark.sanity
+    @allure.title("List products returns 20 total with 10 per page")
+    @allure.severity(allure.severity_level.BLOCKER)
     def test_list_products_success(self, client):
         res = client.get("/api/products/")
         data = res.get_json()
@@ -95,9 +100,13 @@ class TestListProducts:
         assert res.status_code == 200
 
 
+@allure.feature("Products")
+@allure.story("Product Detail")
 class TestGetProduct:
     @pytest.mark.smoke
     @pytest.mark.sanity
+    @allure.title("GET /products/{id} returns correct product data")
+    @allure.severity(allure.severity_level.BLOCKER)
     def test_get_product_by_id_success(self, client):
         res = client.get(f"/api/products/{IN_STOCK_ID}")
         data = res.get_json()
@@ -122,8 +131,12 @@ class TestGetProduct:
         assert data["error"] is not None
 
 
+@allure.feature("Products")
+@allure.story("Create Product")
 class TestCreateProduct:
     @pytest.mark.sanity
+    @allure.title("Create product with valid data returns 201")
+    @allure.severity(allure.severity_level.CRITICAL)
     def test_create_product_success(self, client, auth_headers):
         res = client.post("/api/products/", headers=auth_headers, json={
             "name": "Test Gadget",
