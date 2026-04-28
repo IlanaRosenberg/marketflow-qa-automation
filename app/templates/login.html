@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Login — MarketFlow{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-5">
+    <div class="card shadow-sm mt-4">
+      <div class="card-body p-4">
+        <h2 class="card-title mb-4 text-center">Login</h2>
+        <div class="alert alert-danger d-none" data-testid="error-message" id="error-message"></div>
+        <form data-testid="login-form" id="login-form">
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" data-testid="input-email" id="input-email"
+              name="email" placeholder="you@example.com" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" data-testid="input-password" id="input-password"
+              name="password" placeholder="Password" required />
+          </div>
+          <button type="submit" class="btn btn-primary w-100" data-testid="btn-login" id="btn-login">
+            Login
+          </button>
+        </form>
+        <hr />
+        <p class="text-center mb-0">
+          Don't have an account?
+          <a href="/register" data-testid="link-register">Register here</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById("login-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("input-email").value;
+  const password = document.getElementById("input-password").value;
+  const errEl = document.getElementById("error-message");
+  errEl.classList.add("d-none");
+
+  try {
+    const res = await api.post("/api/auth/login", { email, password });
+    if (res.success) {
+      localStorage.setItem("marketflow_token", res.data.token);
+      localStorage.setItem("marketflow_user", JSON.stringify({
+        id: res.data.user_id,
+        username: res.data.username,
+      }));
+      window.location.href = "/";
+    } else {
+      errEl.textContent = res.error;
+      errEl.classList.remove("d-none");
+    }
+  } catch (err) {
+    errEl.textContent = "An unexpected error occurred";
+    errEl.classList.remove("d-none");
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Order Detail — MarketFlow{% endblock %}
+
+{% block content %}
+<div data-testid="page-order-detail" id="page-order-detail">
+  <div class="text-center py-5" id="loading-spinner">
+    <div class="spinner-border" role="status"></div>
+  </div>
+
+  <div class="d-none" id="order-content">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/order-history" data-testid="link-back-to-orders">Order History</a></li>
+        <li class="breadcrumb-item active" id="order-breadcrumb"></li>
+      </ol>
+    </nav>
+
+    <div class="row">
+      <div class="col-md-8">
+        <h1 data-testid="order-title" id="order-title"></h1>
+        <p>
+          Status: <span class="badge" data-testid="status-badge" id="status-badge"></span>
+        </p>
+        <p data-testid="order-date" id="order-date"></p>
+
+        <table class="table" data-testid="order-items-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Qty</th>
+              <th>Unit Price</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody id="order-items-tbody"></tbody>
+        </table>
+
+        <p class="fs-4 fw-bold" data-testid="order-total">
+          Total: <span data-testid="order-total-amount" id="order-total-amount"></span>
+        </p>
+
+        <button class="btn btn-outline-danger" data-testid="btn-cancel-order" id="btn-cancel-order"
+          onclick="cancelThisOrder()">Cancel Order</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert alert-danger d-none" data-testid="page-error" id="page-error"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const orderId = {{ order_id }};
+const STATUS_BADGES = {
+  completed: "bg-success",
+  pending: "bg-warning text-dark",
+  cancelled: "bg-secondary",
+};
+
+async function loadOrder() {
+  const res = await api.get(`/api/orders/${orderId}`);
+  document.getElementById("loading-spinner").classList.add("d-none");
+
+  if (!res.success) {
+    const el = document.getElementById("page-error");
+    el.textContent = res.error || "Order not found";
+    el.classList.remove("d-none");
+    return;
+  }
+
+  const o = res.data;
+  document.getElementById("order-title").textContent = `Order #${o.id}`;
+  document.getElementById("order-breadcrumb").textContent = `Order #${o.id}`;
+  const badge = document.getElementById("status-badge");
+  badge.textContent = o.status;
+  badge.className = `badge ${STATUS_BADGES[o.status] || "bg-secondary"}`;
+  document.getElementById("order-date").textContent = `Placed on: ${new Date(o.created_at).toLocaleString()}`;
+  document.getElementById("order-total-amount").textContent = `$${o.total_price.toFixed(2)}`;
+
+  const cancelBtn = document.getElementById("btn-cancel-order");
+  if (o.status === "cancelled") cancelBtn.disabled = true;
+
+  document.getElementById("order-items-tbody").innerHTML = o.items.map(item => `
+    <tr data-testid="order-item-row-${item.product_id}">
+      <td data-testid="order-item-name-${item.product_id}">${escHtml(item.product_name)}</td>
+      <td data-testid="order-item-qty-${item.product_id}">${item.quantity}</td>
+      <td data-testid="order-item-price-${item.product_id}">$${item.unit_price.toFixed(2)}</td>
+      <td data-testid="order-item-total-${item.product_id}">$${item.subtotal.toFixed(2)}</td>
+    </tr>
+  `).join("");
+
+  document.getElementById("order-content").classList.remove("d-none");
+}
+
+async function cancelThisOrder() {
+  if (!confirm("Cancel this order?")) return;
+  const res = await api.post(`/api/orders/${orderId}/cancel`, {});
+  if (res.success) loadOrder();
+  else showToast(res.error, "danger");
+}
+
+loadOrder();
+</script>
+{% endblock %}

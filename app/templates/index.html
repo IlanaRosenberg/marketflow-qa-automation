@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% block title %}Products — MarketFlow{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Products</h1>
+
+<!-- Live Cart Summary Panel -->
+<div class="card border-success mb-4 d-none" id="cart-summary-panel" data-testid="cart-summary-panel">
+  <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+    <span class="fw-bold">&#128722; Cart Summary</span>
+    <span class="badge bg-white text-success" data-testid="cart-panel-count" id="cart-panel-count">0 items</span>
+  </div>
+  <div class="card-body py-2 px-3">
+    <div id="cart-panel-items" data-testid="cart-panel-items"></div>
+    <hr class="my-2" />
+    <div class="d-flex justify-content-between align-items-center">
+      <span class="fw-bold">Total:</span>
+      <span class="fw-bold text-success fs-5" data-testid="cart-panel-total" id="cart-panel-total">$0.00</span>
+    </div>
+  </div>
+  <div class="card-footer d-flex gap-2">
+    <a href="/cart" class="btn btn-outline-success btn-sm flex-grow-1" data-testid="cart-panel-view-cart">View Cart</a>
+    <a href="/checkout" class="btn btn-success btn-sm flex-grow-1" data-testid="cart-panel-checkout">Checkout</a>
+  </div>
+</div>
+
+<div class="row mb-3 g-2">
+  <div class="col-md-6">
+    <input type="text" class="form-control" data-testid="search-box" id="search-box"
+      placeholder="Search products..." />
+  </div>
+  <div class="col-md-3">
+    <select class="form-select" data-testid="sort-dropdown" id="sort-dropdown">
+      <option value="name">Sort by Name</option>
+      <option value="price">Price: Low to High</option>
+      <option value="-price">Price: High to Low</option>
+    </select>
+  </div>
+  <div class="col-md-3">
+    <select class="form-select" data-testid="category-filter" id="category-filter">
+      <option value="">All Categories</option>
+      <option value="Electronics">Electronics</option>
+      <option value="Sports">Sports</option>
+      <option value="Kitchen">Kitchen</option>
+      <option value="Books">Books</option>
+      <option value="Home">Home</option>
+    </select>
+  </div>
+</div>
+
+<div class="alert alert-danger d-none" data-testid="error-message" id="error-message"></div>
+
+<div data-testid="products-list" id="products-list" class="row row-cols-1 row-cols-md-3 g-4">
+  <div class="col text-center py-5">
+    <div class="spinner-border" role="status"></div>
+  </div>
+</div>
+
+<div class="d-none text-center py-5" data-testid="no-results" id="no-results">
+  <p class="text-muted fs-5">No products found.</p>
+</div>
+
+<div class="d-flex justify-content-center align-items-center gap-3 mt-4" data-testid="pagination" id="pagination">
+  <button class="btn btn-outline-secondary" data-testid="btn-prev-page" id="btn-prev-page" disabled>
+    &laquo; Previous
+  </button>
+  <span data-testid="current-page" id="current-page">Page 1</span>
+  <button class="btn btn-outline-secondary" data-testid="btn-next-page" id="btn-next-page" disabled>
+    Next &raquo;
+  </button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentPage = 1;
+const perPage = 10;
+
+async function loadProducts() {
+  const search = document.getElementById("search-box").value;
+  const sort = document.getElementById("sort-dropdown").value;
+  const category = document.getElementById("category-filter").value;
+  const list = document.getElementById("products-list");
+  const noResults = document.getElementById("no-results");
+  const errEl = document.getElementById("error-message");
+
+  list.innerHTML = '<div class="col text-center py-5"><div class="spinner-border" role="status"></div></div>';
+  noResults.classList.add("d-none");
+  errEl.classList.add("d-none");
+
+  try {
+    const params = new URLSearchParams({
+      page: currentPage,
+      per_page: perPage,
+      search,
+      sort,
+      category,
+    });
+    const res = await api.get(`/api/products/?${params}`);
+    if (!res.success) {
+      errEl.textContent = res.error;
+      errEl.classList.remove("d-none");
+      list.innerHTML = "";
+      return;
+    }
+    const { products, total, pages } = res.data;
+    document.getElementById("current-page").textContent = `Page ${currentPage} of ${pages || 1}`;
+    document.getElementById("btn-prev-page").disabled = currentPage <= 1;
+    document.getElementById("btn-next-page").disabled = currentPage >= (pages || 1);
+
+    if (products.length === 0) {
+      list.innerHTML = "";
+      noResults.classList.remove("d-none");
+      return;
+    }
+
+    list.innerHTML = products.map(p => `
+      <div class="col" data-testid="product-card-${p.id}">
+        <div class="card h-100 shadow-sm product-card">
+          ${p.image_url ? `<img src="${escHtml(p.image_url)}" class="card-img-top product-card-img" alt="${escHtml(p.name)}" data-testid="product-img-${p.id}" loading="lazy" />` : ""}
+          <div class="card-body">
+            <h5 class="card-title" data-testid="product-name-${p.id}">${escHtml(p.name)}</h5>
+            <span class="badge bg-secondary mb-2">${escHtml(p.category || "")}</span>
+            <p class="card-text text-muted small">${escHtml((p.description || "").substring(0, 80))}</p>
+            <p class="fw-bold fs-5 mb-1" data-testid="product-price-${p.id}">$${p.price.toFixed(2)}</p>
+            <p class="small ${p.stock_quantity === 0 ? "text-danger" : "text-success"}" data-testid="product-stock-${p.id}">
+              ${p.stock_quantity === 0 ? "Out of stock" : `In stock: ${p.stock_quantity}`}
+            </p>
+          </div>
+          <div class="card-footer d-flex gap-2">
+            <a href="/products/${p.id}" class="btn btn-outline-primary btn-sm flex-grow-1"
+              data-testid="product-link-${p.id}">Details</a>
+            <button class="btn btn-primary btn-sm flex-grow-1"
+              data-testid="btn-add-to-cart-${p.id}"
+              onclick="addToCartFromList(${p.id})"
+              ${p.stock_quantity === 0 ? "disabled" : ""}>
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </div>
+    `).join("");
+  } catch (err) {
+    errEl.textContent = "Failed to load products";
+    errEl.classList.remove("d-none");
+    list.innerHTML = "";
+  }
+}
+
+function renderCartPanel(data) {
+  const { items, total_price, item_count } = data;
+  const panel = document.getElementById("cart-summary-panel");
+
+  if (item_count === 0) {
+    panel.classList.add("d-none");
+    return;
+  }
+
+  panel.classList.remove("d-none");
+  document.getElementById("cart-panel-count").textContent = `${item_count} item${item_count !== 1 ? "s" : ""}`;
+  document.getElementById("cart-panel-total").textContent = `$${total_price.toFixed(2)}`;
+  document.getElementById("cart-panel-items").innerHTML = items.map(item => `
+    <div class="d-flex justify-content-between small py-1" data-testid="cart-panel-item-${item.product_id}">
+      <span class="text-truncate me-2" style="max-width:65%">${escHtml(item.product_name)} &times;${item.quantity}</span>
+      <span class="text-nowrap">$${item.subtotal.toFixed(2)}</span>
+    </div>
+  `).join("");
+}
+
+async function refreshCartPanel() {
+  if (!localStorage.getItem("marketflow_token")) return;
+  const res = await api.get("/api/cart/");
+  if (res.success) renderCartPanel(res.data);
+}
+
+async function addToCartFromList(productId) {
+  if (!localStorage.getItem("marketflow_token")) {
+    window.location.href = "/login";
+    return;
+  }
+  const res = await api.post("/api/cart/add", { product_id: productId, quantity: 1 });
+  if (res.success) {
+    updateCartCount(res.data.item_count);
+    renderCartPanel(res.data);
+    showToast("Added to cart!");
+  } else {
+    showToast(res.error, "danger");
+  }
+}
+
+document.getElementById("search-box").addEventListener("input", debounce(() => { currentPage = 1; loadProducts(); }, 400));
+document.getElementById("sort-dropdown").addEventListener("change", () => { currentPage = 1; loadProducts(); });
+document.getElementById("category-filter").addEventListener("change", () => { currentPage = 1; loadProducts(); });
+document.getElementById("btn-prev-page").addEventListener("click", () => { currentPage--; loadProducts(); });
+document.getElementById("btn-next-page").addEventListener("click", () => { currentPage++; loadProducts(); });
+
+loadProducts();
+refreshCartPanel();
+</script>
+{% endblock %}

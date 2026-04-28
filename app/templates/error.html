@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Error — MarketFlow{% endblock %}
+
+{% block content %}
+<div class="text-center py-5" data-testid="page-error">
+  <h1 class="display-1 text-danger">{{ code | default(404) }}</h1>
+  <h2>{{ message | default("Page Not Found") }}</h2>
+  <a href="/" class="btn btn-primary mt-3">Back to Home</a>
+</div>
+{% endblock %}

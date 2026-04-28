@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Register — MarketFlow{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-5">
+    <div class="card shadow-sm mt-4">
+      <div class="card-body p-4">
+        <h2 class="card-title mb-4 text-center">Create Account</h2>
+        <div class="alert alert-danger d-none" data-testid="error-message" id="error-message"></div>
+        <form data-testid="register-form" id="register-form">
+          <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input type="text" class="form-control" data-testid="input-username" id="input-username"
+              name="username" placeholder="johndoe" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" data-testid="input-email" id="input-email"
+              name="email" placeholder="you@example.com" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" data-testid="input-password" id="input-password"
+              name="password" placeholder="At least 6 characters" required />
+          </div>
+          <div class="row">
+            <div class="col mb-3">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-control" data-testid="input-first-name" id="input-first-name"
+                name="first_name" placeholder="John" />
+            </div>
+            <div class="col mb-3">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-control" data-testid="input-last-name" id="input-last-name"
+                name="last_name" placeholder="Doe" />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-success w-100" data-testid="btn-register" id="btn-register">
+            Register
+          </button>
+        </form>
+        <hr />
+        <p class="text-center mb-0">
+          Already have an account?
+          <a href="/login" data-testid="link-login">Login here</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById("register-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const errEl = document.getElementById("error-message");
+  errEl.classList.add("d-none");
+
+  const payload = {
+    username: document.getElementById("input-username").value,
+    email: document.getElementById("input-email").value,
+    password: document.getElementById("input-password").value,
+    first_name: document.getElementById("input-first-name").value,
+    last_name: document.getElementById("input-last-name").value,
+  };
+
+  try {
+    const res = await api.post("/api/auth/register", payload);
+    if (res.success) {
+      window.location.href = "/login";
+    } else {
+      errEl.textContent = res.error;
+      errEl.classList.remove("d-none");
+    }
+  } catch (err) {
+    errEl.textContent = "An unexpected error occurred";
+    errEl.classList.remove("d-none");
+  }
+});
+</script>
+{% endblock %}

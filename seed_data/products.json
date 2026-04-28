@@ -1,0 +1,202 @@
+[
+  {
+    "id": 1,
+    "name": "Laptop Pro",
+    "description": "High-performance laptop with 16GB RAM and 512GB SSD",
+    "price": 1299.99,
+    "stock_quantity": 10,
+    "sku": "LAPTOP-001",
+    "category": "Electronics",
+    "image_url": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=300&fit=crop"
+  },
+  {
+    "id": 2,
+    "name": "Wireless Mouse",
+    "description": "Ergonomic wireless mouse with long battery life",
+    "price": 29.99,
+    "stock_quantity": 50,
+    "sku": "MOUSE-001",
+    "category": "Electronics",
+    "image_url": "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&h=300&fit=crop"
+  },
+  {
+    "id": 3,
+    "name": "USB-C Cable",
+    "description": "Fast charging and data transfer USB-C cable",
+    "price": 9.99,
+    "stock_quantity": 0,
+    "sku": "CABLE-001",
+    "category": "Electronics",
+    "image_url": "https://images.unsplash.com/photo-1601524909162-ae8725290836?w=400&h=300&fit=crop"
+  },
+  {
+    "id": 4,
+    "name": "Monitor 27\"",
+    "description": "4K UHD monitor with IPS panel and 144Hz refresh rate",
+    "price": 399.99,
+    "stock_quantity": 5,
+    "sku": "MONITOR-001",
+    "category": "Electronics",
+    "image_url": "https://images.unsplash.com/photo-1527443224154-c4a573d5f5fa?w=400&h=300&fit=crop"
+  },
+  {
+    "id": 5,
+    "name": "Mechanical Keyboard",
+    "description": "RGB mechanical keyboard with tactile switches",
+    "price": 149.99,
+    "stock_quantity": 20,
+    "sku": "KEYBOARD-001",
+    "category": "Electronics",
+    "image_url": "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&h=300&fit=crop"
+  },
+  {
+    "id": 6,
+    "name": "Running Shoes",
+    "description": "Lightweight and breathable running shoes for all terrain",
+    "price": 89.99,
+    "stock_quantity": 15,
+    "sku": "SHOES-001",
+    "category": "Sports",
+    "image_url": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=300&fit=crop"
+  },
+  {
+    "id": 7,
+    "name": "Yoga Mat",
+    "description": "Non-slip eco-friendly yoga mat, 6mm thick",
+    "price": 34.99,
+    "stock_quantity": 30,
+    "sku": "YOGA-001",
+    "category": "Sports",
+    "image_url": "https://images.unsplash.com/photo-1601925228897-fb36d5e44a1b?w=400&h=300&fit=crop"
+  },
+  {
+    "id": 8,
+    "name": "Coffee Maker",
+    "description": "Programmable drip coffee maker with thermal carafe",
+    "price": 79.99,
+    "stock_quantity": 1,
+    "sku": "COFFEE-001",
+    "category": "Kitchen",
+    "image_url": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop"
+  },
+  {
+    "id": 9,
+    "name": "The QA Engineer Handbook",
+    "description": "Comprehensive guide to modern QA automation and testing strategies",
+    "price": 14.99,
+    "stock_quantity": 100,
+    "sku": "BOOK-001",
+    "category": "Books",
+    "image_url": "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=400&h=300&fit=crop"
+  },
+  {
+    "id": 10,
+    "name": "Desk Lamp",
+    "description": "Adjustable LED desk lamp with USB charging port",
+    "price": 44.99,
+    "stock_quantity": 0,
+    "sku": "LAMP-001",
+    "category": "Home",
+    "image_url": "https://images.unsplash.com/photo-1573297888476-c09b27e2b35b?w=400&h=300&fit=crop"
+  },
+  {
+    "id": 11,
+    "name": "4K Webcam",
+    "description": "Professional 4K webcam with auto-focus for streaming",
+    "price": 159.99,
+    "stock_quantity": 8,
+    "sku": "WEBCAM-001",
+    "category": "Electronics",
+    "image_url": "https://images.unsplash.com/photo-1587614382346-4ec70e388b28?w=400&h=300&fit=crop"
+  },
+  {
+    "id": 12,
+    "name": "Wireless Headphones",
+    "description": "Noise-cancelling wireless headphones with 30-hour battery",
+    "price": 299.99,
+    "stock_quantity": 12,
+    "sku": "HEADPHONES-001",
+    "category": "Electronics",
+    "image_url": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop"
+  },
+  {
+    "id": 13,
+    "name": "USB Hub 7-Port",
+    "description": "Powered USB hub with 7 ports and individual switches",
+    "price": 34.99,
+    "stock_quantity": 25,
+    "sku": "USBHUB-001",
+    "category": "Electronics",
+    "image_url": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop"
+  },
+  {
+    "id": 14,
+    "name": "Portable Charger",
+    "description": "20000mAh portable power bank with fast charging",
+    "price": 49.99,
+    "stock_quantity": 35,
+    "sku": "CHARGER-001",
+    "category": "Electronics",
+    "image_url": "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400&h=300&fit=crop"
+  },
+  {
+    "id": 15,
+    "name": "Wireless Mouse Pad",
+    "description": "Large wireless charging mouse pad with non-slip surface",
+    "price": 59.99,
+    "stock_quantity": 0,
+    "sku": "MOUSEPAD-001",
+    "category": "Electronics",
+    "image_url": "https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=400&h=300&fit=crop"
+  },
+  {
+    "id": 16,
+    "name": "Standing Desk",
+    "description": "Electric adjustable standing desk with memory presets",
+    "price": 499.99,
+    "stock_quantity": 6,
+    "sku": "STAND-DESK-001",
+    "category": "Home",
+    "image_url": "https://images.unsplash.com/photo-1593642634315-48f5414c3ad9?w=400&h=300&fit=crop"
+  },
+  {
+    "id": 17,
+    "name": "Desk Chair Pro",
+    "description": "Ergonomic office chair with lumbar support and headrest",
+    "price": 349.99,
+    "stock_quantity": 9,
+    "sku": "CHAIR-001",
+    "category": "Home",
+    "image_url": "https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=400&h=300&fit=crop"
+  },
+  {
+    "id": 18,
+    "name": "Monitor Arm Dual",
+    "description": "Adjustable dual monitor arm with VESA mount",
+    "price": 89.99,
+    "stock_quantity": 18,
+    "sku": "MONITOR-ARM-001",
+    "category": "Home",
+    "image_url": "https://images.unsplash.com/photo-1616588589676-62b3bd4ff6d2?w=400&h=300&fit=crop"
+  },
+  {
+    "id": 19,
+    "name": "Screen Protector Pack",
+    "description": "Tempered glass screen protectors for multiple devices (10-pack)",
+    "price": 19.99,
+    "stock_quantity": 50,
+    "sku": "PROTECTOR-001",
+    "category": "Electronics",
+    "image_url": "https://images.unsplash.com/photo-1592303637753-ce1e6b8a0ffb?w=400&h=300&fit=crop"
+  },
+  {
+    "id": 20,
+    "name": "Laptop Stand Aluminum",
+    "description": "Premium aluminum laptop stand with cooling ventilation",
+    "price": 79.99,
+    "stock_quantity": 22,
+    "sku": "LAPTOP-STAND-001",
+    "category": "Home",
+    "image_url": "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=400&h=300&fit=crop"
+  }
+]

@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}My Orders — MarketFlow{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">My Orders</h1>
+<div data-testid="page-my-orders">
+  <div class="text-center py-5" id="loading-spinner">
+    <div class="spinner-border" role="status"></div>
+  </div>
+
+  <div class="d-none" id="orders-content">
+    <div id="orders-has-items">
+      <div id="orders-list"></div>
+    </div>
+
+    <div class="text-center py-5 d-none" data-testid="no-orders" id="no-orders">
+      <p class="fs-5 text-muted">You have no orders yet.</p>
+      <a href="/" class="btn btn-primary">Start Shopping</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const STATUS_BADGES = {
+  completed: "bg-success",
+  pending: "bg-warning text-dark",
+  cancelled: "bg-secondary",
+};
+
+function estimatedDelivery(createdAt) {
+  const d = new Date(createdAt);
+  let added = 0;
+  while (added < 5) {
+    d.setDate(d.getDate() + 1);
+    const day = d.getDay();
+    if (day !== 0 && day !== 6) added++;
+  }
+  return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+}
+
+async function loadMyOrders() {
+  const res = await api.get("/api/orders/?per_page=50");
+  document.getElementById("loading-spinner").classList.add("d-none");
+  document.getElementById("orders-content").classList.remove("d-none");
+
+  if (!res.success) return;
+  const { orders } = res.data;
+
+  if (orders.length === 0) {
+    document.getElementById("orders-has-items").classList.add("d-none");
+    document.getElementById("no-orders").classList.remove("d-none");
+    return;
+  }
+
+  const detailPromises = orders.map(o => api.get(`/api/orders/${o.id}`));
+  const details = await Promise.all(detailPromises);
+
+  document.getElementById("orders-list").innerHTML = details.map((r, idx) => {
+    if (!r.success) return "";
+    const o = r.data;
+    const badgeClass = STATUS_BADGES[o.status] || "bg-secondary";
+    const orderDate = new Date(o.created_at).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    const deliveryDate = o.status === "cancelled" ? "—" : estimatedDelivery(o.created_at);
+    const cancelDisabled = o.status === "cancelled" ? "disabled" : "";
+
+    const itemsHtml = (o.items || []).map(item => `
+      <div class="d-flex align-items-center gap-3 mb-2" data-testid="my-order-item-${item.product_id}">
+        ${item.image_url ? `<img src="${escHtml(item.image_url)}" alt="${escHtml(item.product_name)}" class="rounded" style="width:56px;height:56px;object-fit:cover;" data-testid="my-order-item-img-${item.product_id}" />` : `<div class="rounded bg-light d-flex align-items-center justify-content-center" style="width:56px;height:56px;"><span class="text-muted small">No img</span></div>`}
+        <div class="flex-grow-1">
+          <div class="fw-semibold" data-testid="my-order-item-name-${item.product_id}">${escHtml(item.product_name)}</div>
+          <div class="text-muted small">Qty: ${item.quantity}</div>
+        </div>
+        <div class="fw-bold" data-testid="my-order-item-price-${item.product_id}">$${item.unit_price.toFixed(2)}</div>
+      </div>
+    `).join("");
+
+    return `
+      <div class="card mb-4 shadow-sm" data-testid="my-order-card-${o.id}">
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <div>
+            <span class="fw-bold me-2" data-testid="my-order-id-${o.id}">Order #${o.id}</span>
+            <span class="badge ${badgeClass}" data-testid="my-order-status-${o.id}">${o.status}</span>
+          </div>
+          <div class="text-muted small">
+            <span data-testid="my-order-date-${o.id}">Placed: ${orderDate}</span>
+            &nbsp;|&nbsp;
+            <span data-testid="my-order-delivery-${o.id}">Est. Delivery: ${deliveryDate}</span>
+          </div>
+        </div>
+        <div class="card-body">
+          ${itemsHtml}
+        </div>
+        <div class="card-footer d-flex justify-content-between align-items-center">
+          <span class="fw-bold fs-5" data-testid="my-order-total-${o.id}">Total: $${o.total_price.toFixed(2)}</span>
+          <div class="d-flex gap-2">
+            <a href="/orders/${o.id}" class="btn btn-sm btn-outline-primary" data-testid="my-order-view-${o.id}">View Detail</a>
+            <button class="btn btn-sm btn-outline-danger" data-testid="my-order-cancel-${o.id}"
+              onclick="cancelOrder(${o.id})" ${cancelDisabled}>Cancel Order</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+async function cancelOrder(orderId) {
+  if (!confirm("Cancel this order?")) return;
+  const res = await api.post(`/api/orders/${orderId}/cancel`, {});
+  if (res.success) {
+    showToast("Order cancelled successfully.");
+    loadMyOrders();
+  } else {
+    showToast(res.error, "danger");
+  }
+}
+
+loadMyOrders();
+</script>
+{% endblock %}

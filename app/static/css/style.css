@@ -1,0 +1,39 @@
+/* MarketFlow custom styles */
+body {
+  background-color: #f8f9fa;
+}
+
+/* Sticky footer — body uses d-flex flex-column min-vh-100; main uses flex-grow-1 */
+footer {
+  flex-shrink: 0;
+}
+
+.navbar-brand {
+  font-size: 1.4rem;
+}
+
+.product-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+.badge {
+  font-size: 0.8rem;
+}
+
+.product-card-img {
+  height: 180px;
+  object-fit: cover;
+}
+
+/* Toast container */
+#toast-container {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+}

@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Cart — MarketFlow{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Your Cart</h1>
+
+<div class="alert alert-danger d-none" data-testid="error-message" id="error-message"></div>
+
+<div data-testid="page-cart" id="page-cart">
+  <div class="text-center py-5" id="loading-spinner">
+    <div class="spinner-border" role="status"></div>
+  </div>
+
+  <div class="d-none" id="cart-content">
+    <div id="cart-has-items">
+      <table class="table table-hover" data-testid="cart-items-table" id="cart-items-table">
+        <thead data-testid="cart-header">
+          <tr>
+            <th data-testid="col-product">Product</th>
+            <th data-testid="col-price">Price</th>
+            <th data-testid="col-quantity">Quantity</th>
+            <th data-testid="col-total">Subtotal</th>
+            <th data-testid="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="cart-tbody"></tbody>
+      </table>
+
+      <div class="d-flex justify-content-between align-items-center mt-3" data-testid="cart-summary">
+        <div>
+          <p class="mb-1">Items: <strong data-testid="item-count" id="item-count">0</strong></p>
+          <p class="fs-4 mb-0">Total: <strong data-testid="total-amount" id="total-amount">$0.00</strong></p>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-danger" data-testid="btn-clear-cart" onclick="clearCart()">
+            Clear Cart
+          </button>
+          <a href="/checkout" class="btn btn-success" data-testid="btn-checkout">
+            Proceed to Checkout
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center py-5 d-none" data-testid="cart-empty" id="cart-empty">
+      <p class="fs-5 text-muted">Your cart is empty.</p>
+      <a href="/" class="btn btn-primary" data-testid="link-continue-shopping">Continue Shopping</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function loadCart() {
+  const res = await api.get("/api/cart/");
+  document.getElementById("loading-spinner").classList.add("d-none");
+  document.getElementById("cart-content").classList.remove("d-none");
+
+  if (!res.success) {
+    document.getElementById("error-message").textContent = res.error;
+    document.getElementById("error-message").classList.remove("d-none");
+    return;
+  }
+  renderCart(res.data);
+}
+
+function renderCart(data) {
+  const { items, total_price, item_count } = data;
+  document.getElementById("item-count").textContent = item_count;
+  document.getElementById("total-amount").textContent = `$${total_price.toFixed(2)}`;
+  updateCartCount(item_count);
+
+  if (item_count === 0) {
+    document.getElementById("cart-has-items").classList.add("d-none");
+    document.getElementById("cart-empty").classList.remove("d-none");
+    return;
+  }
+
+  document.getElementById("cart-has-items").classList.remove("d-none");
+  document.getElementById("cart-empty").classList.add("d-none");
+
+  document.getElementById("cart-tbody").innerHTML = items.map(item => `
+    <tr data-testid="cart-item-row-${item.product_id}">
+      <td data-testid="cart-product-name-${item.product_id}">${escHtml(item.product_name)}</td>
+      <td data-testid="cart-product-price-${item.product_id}">$${item.product_price.toFixed(2)}</td>
+      <td>
+        <input type="number" class="form-control form-control-sm" style="width:80px"
+          data-testid="input-quantity-${item.product_id}"
+          value="${item.quantity}" min="1"
+          onchange="updateQty(${item.product_id}, this.value)" />
+      </td>
+      <td data-testid="cart-product-total-${item.product_id}">$${item.subtotal.toFixed(2)}</td>
+      <td>
+        <button class="btn btn-sm btn-outline-danger"
+          data-testid="btn-remove-item-${item.product_id}"
+          onclick="removeItem(${item.product_id})">Remove</button>
+      </td>
+    </tr>
+  `).join("");
+}
+
+async function updateQty(productId, qty) {
+  const res = await api.patch(`/api/cart/item/${productId}`, { quantity: parseInt(qty) });
+  if (res.success) renderCart(res.data);
+  else {
+    document.getElementById("error-message").textContent = res.error;
+    document.getElementById("error-message").classList.remove("d-none");
+    loadCart();
+  }
+}
+
+async function removeItem(productId) {
+  const res = await api.delete(`/api/cart/item/${productId}`);
+  if (res.success) renderCart(res.data);
+}
+
+async function clearCart() {
+  const res = await api.delete("/api/cart/clear");
+  if (res.success) renderCart(res.data);
+}
+
+loadCart();
+</script>
+{% endblock %}

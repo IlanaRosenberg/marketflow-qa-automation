@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Product Detail — MarketFlow{% endblock %}
+
+{% block content %}
+<div data-testid="page-product-detail" id="page-product-detail">
+  <div class="text-center py-5" id="loading-spinner">
+    <div class="spinner-border" role="status"></div>
+  </div>
+
+  <div class="d-none" id="product-content">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/" data-testid="link-back-to-products">Products</a></li>
+        <li class="breadcrumb-item active" data-testid="product-title" id="product-title-breadcrumb"></li>
+      </ol>
+    </nav>
+
+    <div class="row">
+      <div class="col-md-4 mb-3" id="product-image-col">
+        <img id="product-image" data-testid="product-image" src="" alt=""
+          class="img-fluid rounded shadow-sm" style="display:none" />
+      </div>
+      <div class="col-md-8">
+        <h1 data-testid="product-title" id="product-title"></h1>
+        <span class="badge bg-secondary mb-3" data-testid="product-category" id="product-category"></span>
+        <p class="text-muted" data-testid="product-description" id="product-description"></p>
+        <p class="small text-secondary">SKU: <span data-testid="product-sku" id="product-sku"></span></p>
+
+        <div class="card p-3 mt-3">
+          <p class="fs-3 fw-bold mb-1" data-testid="product-price" id="product-price"></p>
+          <p data-testid="product-stock" id="product-stock"></p>
+
+          <div class="alert alert-danger d-none" data-testid="error-message" id="error-message"></div>
+          <div class="alert alert-success d-none" data-testid="success-message" id="success-message">
+            Added to cart!
+          </div>
+
+          <form data-testid="add-to-cart-form" id="add-to-cart-form">
+            <div class="row align-items-end g-2">
+              <div class="col-4">
+                <label class="form-label">Quantity</label>
+                <input type="number" class="form-control" data-testid="input-quantity" id="input-quantity"
+                  value="1" min="1" />
+              </div>
+              <div class="col-8">
+                <button type="submit" class="btn btn-primary w-100" data-testid="btn-add-to-cart" id="btn-add-to-cart">
+                  Add to Cart
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert alert-danger d-none" data-testid="page-error" id="page-error"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const productId = {{ product_id }};
+
+async function loadProduct() {
+  const res = await api.get(`/api/products/${productId}`);
+  document.getElementById("loading-spinner").classList.add("d-none");
+
+  if (!res.success) {
+    const el = document.getElementById("page-error");
+    el.textContent = res.error || "Product not found";
+    el.classList.remove("d-none");
+    return;
+  }
+
+  const p = res.data;
+  document.getElementById("product-title").textContent = p.name;
+  document.getElementById("product-title-breadcrumb").textContent = p.name;
+  document.getElementById("product-category").textContent = p.category || "";
+  document.getElementById("product-description").textContent = p.description || "";
+  document.getElementById("product-sku").textContent = p.sku;
+  document.getElementById("product-price").textContent = `$${p.price.toFixed(2)}`;
+
+  if (p.image_url) {
+    const img = document.getElementById("product-image");
+    img.src = p.image_url;
+    img.alt = p.name;
+    img.style.display = "block";
+  }
+
+  const stockEl = document.getElementById("product-stock");
+  if (p.stock_quantity === 0) {
+    stockEl.innerHTML = '<span class="text-danger">Out of stock</span>';
+    document.getElementById("btn-add-to-cart").disabled = true;
+    document.getElementById("input-quantity").disabled = true;
+  } else {
+    stockEl.innerHTML = `<span class="text-success">In stock: ${p.stock_quantity}</span>`;
+    document.getElementById("input-quantity").max = p.stock_quantity;
+  }
+
+  document.getElementById("product-content").classList.remove("d-none");
+}
+
+document.getElementById("add-to-cart-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!localStorage.getItem("marketflow_token")) {
+    window.location.href = "/login";
+    return;
+  }
+  const quantity = parseInt(document.getElementById("input-quantity").value);
+  const errEl = document.getElementById("error-message");
+  const successEl = document.getElementById("success-message");
+  errEl.classList.add("d-none");
+  successEl.classList.add("d-none");
+
+  const res = await api.post("/api/cart/add", { product_id: productId, quantity });
+  if (res.success) {
+    successEl.classList.remove("d-none");
+    updateCartCount(res.data.item_count);
+  } else {
+    errEl.textContent = res.error;
+    errEl.classList.remove("d-none");
+  }
+});
+
+loadProduct();
+</script>
+{% endblock %}

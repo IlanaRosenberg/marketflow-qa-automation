@@ -1,0 +1,28 @@
+# Web framework
+Flask==3.0.3
+Flask-SQLAlchemy==3.1.1
+flask-cors==4.0.1
+
+# Auth
+PyJWT==2.8.0
+Werkzeug==3.0.3
+
+# Swagger / OpenAPI
+flasgger==0.9.7.1
+
+# Testing - API
+pytest==8.2.2
+pytest-cov==5.0.0
+requests==2.32.3
+
+# Testing - UI
+# selenium-manager (bundled in Selenium 4.6+) auto-downloads the correct chromedriver
+# — no webdriver-manager needed, avoids WinError 193 on Windows
+selenium==4.21.0
+
+# Allure reporting
+# Install Allure CLI separately: https://docs.qameta.io/allure/#_installing_a_commandline
+allure-pytest==2.13.5
+
+# Utilities
+python-dotenv==1.0.1
