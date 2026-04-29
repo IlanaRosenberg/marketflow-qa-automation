@@ -27,7 +27,11 @@ def seed_db():
         products_data = json.load(f)
 
     for p in products_data:
-        if not Product.query.filter_by(sku=p["sku"]).first():
+        existing = Product.query.filter_by(sku=p["sku"]).first()
+        if existing:
+            # Always sync image_url so updates to products.json take effect
+            existing.image_url = p.get("image_url")
+        else:
             product = Product(
                 id=p["id"],
                 name=p["name"],
