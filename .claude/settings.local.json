@@ -4,7 +4,8 @@
       "Bash(python -m pytest tests/api/ tests/integration/ -v --tb=short)",
       "Bash(python -m pytest tests/api/ tests/integration/ --tb=short -q)",
       "Bash(python -m pytest tests/ui/ -v --tb=long)",
-      "Bash(python -m pytest tests/ui/test_cart_ui.py::TestCartUI::test_empty_cart_shows_empty_message -v --tb=long -s)"
+      "Bash(python -m pytest tests/ui/test_cart_ui.py::TestCartUI::test_empty_cart_shows_empty_message -v --tb=long -s)",
+      "WebFetch(domain:images.unsplash.com)"
     ]
   }
 }
