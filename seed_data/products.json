@@ -37,7 +37,7 @@
     "stock_quantity": 5,
     "sku": "MONITOR-001",
     "category": "Electronics",
-    "image_url": "https://images.unsplash.com/photo-1527443224154-c4a573d5f5fa?w=400&h=300&fit=crop&auto=format"
+    "image_url": "https://images.unsplash.com/photo-1614179924047-e1ab49a0a0cf?w=400&h=300&fit=crop&auto=format"
   },
   {
     "id": 5,
@@ -67,7 +67,7 @@
     "stock_quantity": 30,
     "sku": "YOGA-001",
     "category": "Sports",
-    "image_url": "https://images.unsplash.com/photo-1601925228897-fb36d5e44a1b?w=400&h=300&fit=crop&auto=format"
+    "image_url": "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?w=400&h=300&fit=crop&auto=format"
   },
   {
     "id": 8,
@@ -97,7 +97,7 @@
     "stock_quantity": 0,
     "sku": "LAMP-001",
     "category": "Home",
-    "image_url": "https://images.unsplash.com/photo-1573297888476-c09b27e2b35b?w=400&h=300&fit=crop&auto=format"
+    "image_url": "https://images.unsplash.com/photo-1607896426171-99097eb60cb6?w=400&h=300&fit=crop&auto=format"
   },
   {
     "id": 11,
