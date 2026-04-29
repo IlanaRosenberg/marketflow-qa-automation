@@ -4,6 +4,7 @@ Bug-catching focus: stock decremented after checkout, cart cleared, cancel valid
 """
 import pytest
 import allure
+from tests.conftest import attach_response
 
 pytestmark = [pytest.mark.api, pytest.mark.regression]
 
@@ -33,6 +34,7 @@ class TestCheckout:
     def test_checkout_success(self, client, auth_headers):
         _add_to_cart(client, auth_headers, IN_STOCK_ID, 1)
         res = _checkout(client, auth_headers)
+        attach_response(res, "Checkout response")
         data = res.get_json()
         assert res.status_code == 201
         assert data["success"] is True

@@ -1,12 +1,13 @@
 """
 Intentional API test failures — known bugs tracked for the Allure report.
 
-These tests are marked xfail(strict=False) so they appear in Allure as
+These tests are marked xfail(strict=True) so they appear in Allure as
 KNOWN FAILURES (orange) rather than blocking the suite. Each one documents
 a real gap between the API spec and the current implementation.
 """
 import pytest
 import allure
+from tests.conftest import attach_response
 
 pytestmark = pytest.mark.api
 
@@ -15,9 +16,10 @@ pytestmark = pytest.mark.api
 @allure.story("Known Failures — Unimplemented Features")
 class TestKnownFailures:
     """
-    Three intentional failures that represent real open bugs.
-    They show up in Allure as XFAIL so the team can track
-    what is not yet implemented.
+    Four documented bugs visible in the Allure report as XFAIL.
+    Each test describes the expected behaviour, the actual behaviour,
+    and the business impact — the same information you would put in a
+    real bug ticket.
     """
 
     @pytest.mark.xfail(strict=True, reason="BUG-001: GET /api/products/ should support ?in_stock=true filter — not yet implemented")
@@ -82,4 +84,71 @@ class TestKnownFailures:
         # Should be sorted ascending by stock_quantity
         assert stocks == sorted(stocks), (
             f"Products are not sorted by stock_quantity ascending. Got: {stocks}"
+        )
+
+
+@allure.feature("Authentication")
+@allure.story("Known Failures — Unimplemented Features")
+class TestAuthKnownFailures:
+
+    @pytest.mark.xfail(strict=True, reason="BUG-004: POST /api/auth/register has no maximum length validation on username — accepts up to 500+ chars")
+    @pytest.mark.api
+    @allure.title("[BUG-004] Username has no maximum length validation")
+    @allure.severity(allure.severity_level.NORMAL)
+    @allure.label("bug_id", "BUG-004")
+    def test_register_username_max_length_not_validated(self, client):
+        """
+        Validation gap: POST /api/auth/register accepts usernames of any length.
+        Industry standard is a maximum of 50-100 characters. Accepting 500+
+        character usernames wastes database storage, can break UI display
+        elements, and may be exploited for denial-of-service through repeated
+        registrations with huge payloads.
+
+        Expected: 400 Bad Request when username exceeds maximum allowed length.
+        Actual:   201 Created — 500-character username is stored successfully.
+        """
+        long_username = "a" * 500
+        res = client.post("/api/auth/register", json={
+            "username": long_username,
+            "email": "toolong@test.com",
+            "password": "Pass123!",
+        })
+        attach_response(res, "Register 500-char username response")
+        assert res.status_code == 400, (
+            f"Expected 400 for username with {len(long_username)} characters "
+            f"but got {res.status_code}. No maximum length is enforced."
+        )
+
+
+@allure.feature("Products")
+@allure.story("Known Failures — Unimplemented Features")
+class TestProductKnownFailures:
+
+    @pytest.mark.xfail(strict=True, reason="BUG-005: POST /api/products/ allows price=0 — free products can be created unintentionally")
+    @pytest.mark.api
+    @allure.title("[BUG-005] Product creation allows price=0 without warning")
+    @allure.severity(allure.severity_level.NORMAL)
+    @allure.label("bug_id", "BUG-005")
+    def test_create_product_zero_price_not_rejected(self, client, auth_headers):
+        """
+        Validation gap: POST /api/products/ accepts price=0, creating a
+        product that is effectively free. While a zero-price product may be
+        intentional in some business models, no warning or explicit flag is
+        required, making it trivially easy to accidentally set a price to 0.
+        A minimum price validation (price > 0) or an explicit 'is_free'
+        boolean flag would prevent accidental free listings.
+
+        Expected: 400 Bad Request or at minimum a validation warning for price=0.
+        Actual:   201 Created — product with price=$0.00 is accepted.
+        """
+        res = client.post("/api/products/", headers=auth_headers, json={
+            "name": "Accidentally Free Product",
+            "price": 0,
+            "stock_quantity": 10,
+            "sku": "FREE-BUG-005",
+        })
+        attach_response(res, "Create product price=0 response")
+        assert res.status_code == 400, (
+            f"Expected 400 for price=0 but got {res.status_code}. "
+            f"Products with zero price should be explicitly flagged or rejected."
         )

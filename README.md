@@ -32,14 +32,15 @@ MarketFlow-QA-Automation/
 │   └── static/                 # CSS · api.js · checkout-payment-validation.js
 ├── seed_data/                  # 2 test users + 20 seeded products
 ├── tests/
-│   ├── conftest.py             # Shared API fixtures (in-memory DB per test)
+│   ├── conftest.py             # Shared API fixtures (in-memory DB per test) + attach_response helper
 │   ├── api/                    # API tests (pytest + Flask test client)
 │   │   ├── test_auth_api.py
 │   │   ├── test_products_api.py
 │   │   ├── test_cart_api.py
 │   │   ├── test_orders_api.py
 │   │   ├── test_error_cases.py
-│   │   └── test_known_failures.py   # 3 intentional xfail tests (open bugs)
+│   │   ├── test_security.py         # SQL injection, XSS, IDOR, auth bypass, data exposure
+│   │   └── test_known_failures.py   # 5 xfail tests documenting real open bugs
 │   ├── ui/                     # Selenium tests with Page Object Model
 │   │   ├── conftest.py         # Session-scoped live server + function-scoped driver
 │   │   ├── pages/              # BasePage, LoginPage, CartPage, CheckoutPage, …
@@ -255,13 +256,15 @@ All responses:
 
 ## Known Failures (Open Bugs)
 
-Three tests in `tests/api/test_known_failures.py` are intentionally marked `xfail` to document open bugs visible in the Allure report:
+Five tests in `tests/api/test_known_failures.py` are marked `xfail(strict=True)` to document real gaps visible in the Allure report as orange XFAIL entries. Each includes the expected behaviour, actual behaviour, and business impact — the same information you would put in a real bug ticket.
 
-| Bug ID | Description |
-|--------|-------------|
-| BUG-001 | `?in_stock=true` filter not implemented — out-of-stock products leak through |
-| BUG-002 | `?min_price` / `?max_price` range filter not implemented — all products returned |
-| BUG-003 | `?sort=stock` not implemented — silently falls back to name sort |
+| Bug ID | Severity | Description |
+|--------|----------|-------------|
+| BUG-001 | Normal | `?in_stock=true` filter not implemented — out-of-stock products leak through |
+| BUG-002 | Normal | `?min_price` / `?max_price` range filter not implemented — all products returned |
+| BUG-003 | Minor | `?sort=stock` not implemented — silently falls back to name sort |
+| BUG-004 | Normal | Username has no maximum length validation — 500-char usernames accepted |
+| BUG-005 | Normal | Product creation allows `price=0` — accidental free listings possible |
 
 ---
 

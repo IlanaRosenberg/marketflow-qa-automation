@@ -4,6 +4,7 @@ Bug-catching focus: exact count/total assertions, stock validation, deduplicatio
 """
 import pytest
 import allure
+from tests.conftest import attach_response
 
 pytestmark = [pytest.mark.api, pytest.mark.regression]
 
@@ -44,6 +45,7 @@ class TestAddToCart:
     def test_add_to_cart_success(self, client, auth_headers):
         res = client.post("/api/cart/add", headers=auth_headers,
                           json={"product_id": IN_STOCK_ID, "quantity": 2})
+        attach_response(res, "Add to cart response")
         data = res.get_json()
         assert res.status_code == 200
         assert data["success"] is True
