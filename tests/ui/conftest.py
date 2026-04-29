@@ -1,4 +1,5 @@
 import pytest
+import allure
 import threading
 import time
 from selenium import webdriver
@@ -53,13 +54,7 @@ def base_url():
 
 @pytest.fixture(scope="function")
 def driver():
-    """Headless Chrome WebDriver using Selenium's built-in driver manager.
-
-    Avoids webdriver_manager which causes WinError 193 on Windows when it
-    downloads a mismatched chromedriver binary. Selenium 4.6+ includes
-    selenium-manager which auto-downloads the correct driver for the local
-    Chrome version.
-    """
+    """Headless Chrome WebDriver. Captures a screenshot on test failure."""
     options = Options()
     # options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
@@ -71,8 +66,21 @@ def driver():
 
     drv = webdriver.Chrome(options=options)
     drv.implicitly_wait(5)
+
     yield drv
-    # Always quit — even if the test raised — so the next test gets a clean driver
+
+    # Attach screenshot to Allure if the test failed
+    if hasattr(drv, "session_id") and drv.session_id:
+        try:
+            screenshot = drv.get_screenshot_as_png()
+            allure.attach(
+                screenshot,
+                name="Screenshot on failure",
+                attachment_type=allure.attachment_type.PNG,
+            )
+        except Exception:
+            pass
+
     try:
         drv.quit()
     except Exception:
@@ -95,7 +103,6 @@ def logged_in_driver(driver, live_app, base_url):
             CartItem.query.filter_by(user_id=user.id).delete()
 
         # Reset stock for products used in UI checkout/cart tests
-        # so each test starts with a known-good stock level
         stock_resets = {
             1: 10,   # Laptop Pro
             2: 50,   # Wireless Mouse
@@ -120,4 +127,17 @@ def logged_in_driver(driver, live_app, base_url):
     driver.find_element("css selector", '[data-testid="input-password"]').send_keys(TEST_USER["password"])
     driver.find_element("css selector", '[data-testid="btn-login"]').click()
     time.sleep(1)
+
+    # Attach the JWT token that the login stored in localStorage
+    try:
+        token = driver.execute_script("return localStorage.getItem('marketflow_token')")
+        if token:
+            allure.attach(
+                token,
+                name="JWT Token — UI login (testuser1)",
+                attachment_type=allure.attachment_type.TEXT,
+            )
+    except Exception:
+        pass
+
     return driver

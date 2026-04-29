@@ -4,6 +4,7 @@ Covers: register, login, logout, /me
 """
 import pytest
 import allure
+from tests.conftest import attach_response
 
 pytestmark = [pytest.mark.api, pytest.mark.regression]
 
@@ -22,6 +23,7 @@ class TestRegister:
             "first_name": "New",
             "last_name": "User",
         })
+        attach_response(res, "Register response")
         data = res.get_json()
         assert res.status_code == 201
         assert data["success"] is True
@@ -38,6 +40,7 @@ class TestRegister:
             "email": "unique@example.com",
             "password": "Pass123!",
         })
+        attach_response(res, "Register duplicate username response")
         data = res.get_json()
         assert res.status_code == 400
         assert data["success"] is False
@@ -51,6 +54,7 @@ class TestRegister:
             "email": "testuser1@example.com",
             "password": "Pass123!",
         })
+        attach_response(res, "Register duplicate email response")
         data = res.get_json()
         assert res.status_code == 400
         assert data["success"] is False
@@ -63,6 +67,7 @@ class TestRegister:
             "email": "a@b.com",
             "password": "Pass123!",
         })
+        attach_response(res, "Register missing username response")
         assert res.status_code == 400
         assert res.get_json()["success"] is False
 
@@ -74,6 +79,7 @@ class TestRegister:
             "email": "not-an-email",
             "password": "Pass123!",
         })
+        attach_response(res, "Register invalid email response")
         assert res.status_code == 400
         assert res.get_json()["success"] is False
 
@@ -85,6 +91,7 @@ class TestRegister:
             "email": "someone@example.com",
             "password": "abc",
         })
+        attach_response(res, "Register short password response")
         assert res.status_code == 400
         assert res.get_json()["success"] is False
 
@@ -101,6 +108,7 @@ class TestLogin:
             "email": "testuser1@example.com",
             "password": "Password123!",
         })
+        attach_response(res, "Login success response")
         data = res.get_json()
         assert res.status_code == 200
         assert data["success"] is True
@@ -115,6 +123,7 @@ class TestLogin:
             "email": "testuser1@example.com",
             "password": "WrongPass!",
         })
+        attach_response(res, "Login wrong password response")
         data = res.get_json()
         assert res.status_code == 401
         assert data["success"] is False
@@ -127,6 +136,7 @@ class TestLogin:
             "email": "ghost@example.com",
             "password": "Password123!",
         })
+        attach_response(res, "Login nonexistent user response")
         assert res.status_code == 401
         assert res.get_json()["success"] is False
 
@@ -134,6 +144,7 @@ class TestLogin:
     @allure.severity(allure.severity_level.MINOR)
     def test_login_missing_email(self, client):
         res = client.post("/api/auth/login", json={"password": "Password123!"})
+        attach_response(res, "Login missing email response")
         assert res.status_code == 400
         assert res.get_json()["success"] is False
 
@@ -141,6 +152,7 @@ class TestLogin:
     @allure.severity(allure.severity_level.MINOR)
     def test_login_missing_password(self, client):
         res = client.post("/api/auth/login", json={"email": "testuser1@example.com"})
+        attach_response(res, "Login missing password response")
         assert res.status_code == 400
         assert res.get_json()["success"] is False
 
@@ -152,6 +164,7 @@ class TestLogout:
     @allure.severity(allure.severity_level.NORMAL)
     def test_logout_success(self, client, auth_headers):
         res = client.post("/api/auth/logout", headers=auth_headers)
+        attach_response(res, "Logout response")
         assert res.status_code == 200
         assert res.get_json()["success"] is True
 
@@ -159,13 +172,16 @@ class TestLogout:
     @allure.severity(allure.severity_level.NORMAL)
     def test_logout_no_token(self, client):
         res = client.post("/api/auth/logout")
+        attach_response(res, "Logout no token response")
         assert res.status_code == 401
         assert res.get_json()["success"] is False
 
     @allure.title("Logout with invalid token returns 401")
     @allure.severity(allure.severity_level.MINOR)
     def test_logout_invalid_token(self, client):
-        res = client.post("/api/auth/logout", headers={"Authorization": "Bearer fake.token.here"})
+        res = client.post("/api/auth/logout",
+                          headers={"Authorization": "Bearer fake.token.here"})
+        attach_response(res, "Logout invalid token response")
         assert res.status_code == 401
 
 
@@ -178,6 +194,7 @@ class TestGetMe:
     @allure.severity(allure.severity_level.CRITICAL)
     def test_get_me_authenticated(self, client, auth_headers):
         res = client.get("/api/auth/me", headers=auth_headers)
+        attach_response(res, "GET /me response")
         data = res.get_json()
         assert res.status_code == 200
         assert data["success"] is True
@@ -188,5 +205,6 @@ class TestGetMe:
     @allure.severity(allure.severity_level.NORMAL)
     def test_get_me_unauthenticated(self, client):
         res = client.get("/api/auth/me")
+        attach_response(res, "GET /me unauthenticated response")
         assert res.status_code == 401
         assert res.get_json()["success"] is False
