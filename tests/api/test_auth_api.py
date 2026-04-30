@@ -95,6 +95,42 @@ class TestRegister:
         assert res.status_code == 400
         assert res.get_json()["success"] is False
 
+    @allure.title("Register without password field returns 400")
+    @allure.severity(allure.severity_level.MINOR)
+    def test_register_missing_password(self, client):
+        res = client.post("/api/auth/register", json={
+            "username": "someone",
+            "email": "someone@example.com",
+        })
+        attach_response(res, "Register missing password response")
+        assert res.status_code == 400
+        assert res.get_json()["success"] is False
+
+    @allure.title("Register without email field returns 400")
+    @allure.severity(allure.severity_level.MINOR)
+    def test_register_missing_email(self, client):
+        res = client.post("/api/auth/register", json={
+            "username": "someone",
+            "password": "Pass123!",
+        })
+        attach_response(res, "Register missing email response")
+        assert res.status_code == 400
+        assert res.get_json()["success"] is False
+
+    @allure.title("Registered user data does not include password hash")
+    @allure.severity(allure.severity_level.CRITICAL)
+    def test_register_response_does_not_expose_password(self, client):
+        """Bug-catcher: password or password_hash must never appear in API response."""
+        res = client.post("/api/auth/register", json={
+            "username": "securecheck",
+            "email": "securecheck@example.com",
+            "password": "Pass123!",
+        })
+        data = res.get_json()
+        assert res.status_code == 201
+        assert "password" not in data["data"]
+        assert "password_hash" not in data["data"]
+
 
 @allure.feature("Authentication")
 @allure.story("User Login")

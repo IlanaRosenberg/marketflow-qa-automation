@@ -30,6 +30,12 @@ class CheckoutPage(BasePage):
         return self
 
     def get_order_total(self) -> str:
+        # Wait until the async loadCheckout() replaces the initial "$0.00"
+        WebDriverWait(self.driver, 10).until(
+            lambda d: d.find_element(
+                By.CSS_SELECTOR, '[data-testid="checkout-total-amount"]'
+            ).text.strip() not in ("$0.00", "")
+        )
         return self.get_text("checkout-total-amount")
 
     def select_payment_method(self, value: str):

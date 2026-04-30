@@ -189,3 +189,57 @@ class TestCreateProduct:
             "sku": "NEG-001",
         })
         assert res.status_code == 400
+
+    def test_create_product_missing_sku(self, client, auth_headers):
+        res = client.post("/api/products/", headers=auth_headers, json={
+            "name": "No SKU Product",
+            "price": 19.99,
+            "stock_quantity": 5,
+        })
+        assert res.status_code == 400
+        assert res.get_json()["success"] is False
+
+
+@allure.feature("Products")
+@allure.story("List Products — Combined Filters")
+class TestListProductsCombinedFilters:
+    @allure.title("Search + category filter together returns only matching results")
+    @allure.severity(allure.severity_level.NORMAL)
+    def test_search_and_category_together(self, client):
+        """Bug-catcher: combined ?search=&category= must apply both constraints."""
+        res = client.get("/api/products/?search=Mouse&category=Electronics")
+        data = res.get_json()
+        assert res.status_code == 200
+        products = data["data"]["products"]
+        assert len(products) >= 1
+        for p in products:
+            assert p["category"] == "Electronics"
+            assert "mouse" in (p["name"] + (p["description"] or "")).lower()
+
+    @allure.title("Category + sort filters together return sorted results")
+    @allure.severity(allure.severity_level.NORMAL)
+    def test_category_and_sort_together(self, client):
+        res = client.get("/api/products/?category=Electronics&sort=price")
+        data = res.get_json()
+        assert res.status_code == 200
+        products = data["data"]["products"]
+        assert all(p["category"] == "Electronics" for p in products)
+        prices = [p["price"] for p in products]
+        assert prices == sorted(prices)
+
+    @allure.title("Page beyond total returns empty list not error")
+    @allure.severity(allure.severity_level.MINOR)
+    def test_page_beyond_total_returns_empty(self, client):
+        """Requesting a page number past the last page should return [] not 404."""
+        res = client.get("/api/products/?page=999")
+        data = res.get_json()
+        assert res.status_code == 200
+        assert data["data"]["products"] == []
+
+    @allure.title("Default sort is by name ascending")
+    @allure.severity(allure.severity_level.MINOR)
+    def test_default_sort_is_by_name(self, client):
+        res = client.get("/api/products/?per_page=20")
+        data = res.get_json()
+        names = [p["name"] for p in data["data"]["products"]]
+        assert names == sorted(names, key=str.lower)

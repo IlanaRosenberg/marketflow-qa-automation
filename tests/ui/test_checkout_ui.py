@@ -262,3 +262,66 @@ class TestCheckoutUI:
         CheckoutPage(driver, base_url).open()
         time.sleep(1)
         assert "/checkout" not in driver.current_url
+
+
+@allure.feature("Orders")
+@allure.story("My Orders UI")
+class TestMyOrdersUI:
+    @allure.title("My Orders page shows order placed after checkout")
+    @allure.severity(allure.severity_level.CRITICAL)
+    def test_my_orders_shows_order_after_checkout(self, logged_in_driver, base_url):
+        """Bug-catcher: after a successful checkout, /my-orders must display the order card."""
+        driver = logged_in_driver
+        add_via_api(driver, base_url, MOUSE_ID, 1)
+        page = CheckoutPage(driver, base_url).open()
+        page.click_next_to_payment()
+        time.sleep(0.3)
+        page.fill_and_submit_card("4111111111111111", "12/30", "123")
+        time.sleep(2.5)
+        assert "/my-orders" in driver.current_url
+        cards = driver.find_elements(By.CSS_SELECTOR, '[data-testid^="my-order-card-"]')
+        assert len(cards) >= 1
+
+    @allure.title("My Orders page shows correct order status as completed")
+    @allure.severity(allure.severity_level.NORMAL)
+    def test_my_orders_shows_completed_status(self, logged_in_driver, base_url):
+        """Order status badge on /my-orders must read 'completed' after checkout."""
+        driver = logged_in_driver
+        add_via_api(driver, base_url, MOUSE_ID, 1)
+        page = CheckoutPage(driver, base_url).open()
+        page.click_next_to_payment()
+        time.sleep(0.3)
+        page.fill_and_submit_card("4111111111111111", "12/30", "123")
+        time.sleep(2.5)
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, '[data-testid^="my-order-status-"]'))
+        )
+        status_el = driver.find_elements(By.CSS_SELECTOR, '[data-testid^="my-order-status-"]')[0]
+        assert "completed" in status_el.text.lower()
+
+    @allure.title("View Detail link on My Orders opens order detail page")
+    @allure.severity(allure.severity_level.NORMAL)
+    def test_my_orders_view_detail_link_works(self, logged_in_driver, base_url):
+        """Clicking View Detail from /my-orders must navigate to /orders/<id>."""
+        driver = logged_in_driver
+        add_via_api(driver, base_url, MOUSE_ID, 1)
+        page = CheckoutPage(driver, base_url).open()
+        page.click_next_to_payment()
+        time.sleep(0.3)
+        page.fill_and_submit_card("4111111111111111", "12/30", "123")
+        time.sleep(2.5)
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, '[data-testid^="my-order-view-"]'))
+        )
+        view_btn = driver.find_elements(By.CSS_SELECTOR, '[data-testid^="my-order-view-"]')[0]
+        view_btn.click()
+        time.sleep(1)
+        assert "/orders/" in driver.current_url
+
+    @allure.title("My Orders page is protected — unauthenticated user redirected to login")
+    @allure.severity(allure.severity_level.CRITICAL)
+    def test_my_orders_requires_login(self, driver, base_url):
+        """Unauthenticated user navigating to /my-orders must be redirected to /login."""
+        driver.get(f"{base_url}/my-orders")
+        time.sleep(1)
+        assert "/login" in driver.current_url

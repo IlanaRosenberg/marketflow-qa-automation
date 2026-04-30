@@ -106,3 +106,32 @@ class TestRegisterUI:
         page.click_login_link()
         time.sleep(0.5)
         assert "/login" in driver.current_url
+
+
+@allure.feature("Authentication")
+@allure.story("Logout UI")
+class TestLogoutUI:
+    @allure.title("Logout via navbar clears session and redirects to login")
+    @allure.severity(allure.severity_level.CRITICAL)
+    def test_logout_via_navbar_redirects_to_login(self, logged_in_driver, base_url):
+        """Bug-catcher: clicking Logout must clear the token and redirect to /login."""
+        driver = logged_in_driver
+        driver.get(base_url)
+        time.sleep(0.5)
+        logout_link = driver.find_element("css selector", '[data-testid="nav-logout"]')
+        logout_link.click()
+        time.sleep(1)
+        assert "/login" in driver.current_url
+
+    @allure.title("Logged-out user cannot access cart page")
+    @allure.severity(allure.severity_level.NORMAL)
+    def test_logged_out_user_redirected_from_cart(self, logged_in_driver, base_url):
+        """After logout, navigating to /cart must redirect to /login."""
+        driver = logged_in_driver
+        driver.get(base_url)
+        time.sleep(0.5)
+        driver.find_element("css selector", '[data-testid="nav-logout"]').click()
+        time.sleep(1)
+        driver.get(f"{base_url}/cart")
+        time.sleep(0.5)
+        assert "/login" in driver.current_url

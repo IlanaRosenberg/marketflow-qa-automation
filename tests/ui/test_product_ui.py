@@ -26,11 +26,9 @@ class TestProductListUI:
         count = page.get_product_count()
         assert count > 0
 
-    def test_all_10_products_visible_with_large_page(self, driver, base_url):
-        driver.get(f"{base_url}/?per_page=20")
-        page = ProductListPage(driver, base_url)
-        page.wait_for_visible("products-list")
-        time.sleep(0.5)
+    def test_default_page_shows_10_products(self, driver, base_url):
+        """Product list shows 10 products per page by default."""
+        page = ProductListPage(driver, base_url).open()
         assert page.get_product_count() == 10
 
     def test_search_filters_products(self, driver, base_url):
@@ -85,6 +83,33 @@ class TestProductListUI:
         time.sleep(0.8)
         after = page.get_cart_count()
         assert after == before + 1
+
+    @allure.title("Next page button loads page 2 of products")
+    @allure.severity(allure.severity_level.NORMAL)
+    def test_next_page_loads_different_products(self, driver, base_url):
+        """Bug-catcher: clicking Next must advance the page and show new products."""
+        page = ProductListPage(driver, base_url).open()
+        page_1_names = set(page.get_product_names())
+        page.click_next_page()
+        time.sleep(0.5)
+        page_2_names = set(page.get_product_names())
+        assert page_2_names != page_1_names, (
+            "Page 2 products must differ from page 1 products"
+        )
+        assert len(page_2_names) > 0
+
+    @allure.title("Previous page button returns to page 1")
+    @allure.severity(allure.severity_level.NORMAL)
+    def test_prev_page_returns_to_page_1(self, driver, base_url):
+        """Navigate next then back — must return to the exact same page 1 results."""
+        page = ProductListPage(driver, base_url).open()
+        page_1_names = set(page.get_product_names())
+        page.click_next_page()
+        time.sleep(0.5)
+        page.click_prev_page()
+        time.sleep(0.5)
+        returned_names = set(page.get_product_names())
+        assert returned_names == page_1_names
 
 
 @allure.feature("Products")

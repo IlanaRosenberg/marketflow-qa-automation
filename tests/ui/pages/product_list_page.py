@@ -72,12 +72,14 @@ class ProductListPage(BasePage):
         return "d-none" not in el.get_attribute("class")
 
     def click_next_page(self):
-        self.click("btn-next-page")
-        time.sleep(0.3)
+        el = self.wait_for_clickable("btn-next-page")
+        self.driver.execute_script("arguments[0].click();", el)
+        time.sleep(0.5)
 
     def click_prev_page(self):
-        self.click("btn-prev-page")
-        time.sleep(0.3)
+        el = self.wait_for_clickable("btn-prev-page")
+        self.driver.execute_script("arguments[0].click();", el)
+        time.sleep(0.5)
 
     def get_current_page_text(self) -> str:
         return self.get_text("current-page")

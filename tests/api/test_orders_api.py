@@ -92,6 +92,24 @@ class TestCheckout:
         assert IN_STOCK_ID in product_ids
         assert MOUSE_ID in product_ids
 
+    def test_checkout_unit_price_snapshot_preserved(self, client, auth_headers):
+        """Bug-catcher: unit_price in OrderItem must equal the product price at time of purchase."""
+        product_price = client.get(f"/api/products/{MOUSE_ID}").get_json()["data"]["price"]
+        _add_to_cart(client, auth_headers, MOUSE_ID, 3)
+        res = _checkout(client, auth_headers)
+        items = res.get_json()["data"]["items"]
+        mouse_item = next(i for i in items if i["product_id"] == MOUSE_ID)
+        assert mouse_item["unit_price"] == product_price, (
+            f"OrderItem unit_price {mouse_item['unit_price']} must match product price {product_price} at time of purchase"
+        )
+
+    def test_checkout_invalid_payment_method_rejected(self, client, auth_headers):
+        """Unsupported payment method must return 400."""
+        _add_to_cart(client, auth_headers, MOUSE_ID, 1)
+        res = _checkout(client, auth_headers, payment_method="bitcoin")
+        assert res.status_code == 400
+        assert res.get_json()["success"] is False
+
 
 @allure.feature("Orders")
 @allure.story("Order History")

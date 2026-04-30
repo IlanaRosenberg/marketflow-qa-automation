@@ -155,6 +155,27 @@ class TestUpdateCartItem:
                            json={"quantity": 2})
         assert res.status_code == 404
 
+    def test_update_quantity_to_zero_removes_item(self, client, auth_headers):
+        """Bug-catcher: updating quantity to 0 should remove the item from cart."""
+        client.post("/api/cart/add", headers=auth_headers,
+                    json={"product_id": MOUSE_ID, "quantity": 3})
+        res = client.patch(f"/api/cart/item/{MOUSE_ID}", headers=auth_headers,
+                           json={"quantity": 0})
+        # Either 200 (item removed) or 400 (0 rejected) is acceptable;
+        # what is NOT acceptable is 200 with the item still in cart at qty=0.
+        if res.status_code == 200:
+            items = res.get_json()["data"]["items"]
+            product_ids = [i["product_id"] for i in items]
+            assert MOUSE_ID not in product_ids, (
+                "Updating quantity to 0 should remove the item, not keep it at qty=0"
+            )
+        else:
+            assert res.status_code == 400
+
+    def test_update_unauthenticated(self, client):
+        res = client.patch(f"/api/cart/item/{IN_STOCK_ID}", json={"quantity": 1})
+        assert res.status_code == 401
+
 
 @allure.feature("Cart")
 @allure.story("Remove Cart Item")
