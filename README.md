@@ -212,6 +212,8 @@ allure open allure-report
 | **XFAIL (broken)** | BUG-001, BUG-002, BUG-003 — open bugs visible on the dashboard |
 | **Timeline** | Execution order and duration per test |
 
+![Allure Report](docs/image/allure-report.png)
+
 > `allure-results/` and `allure-report/` are in `.gitignore` and are never committed.
 
 ---
@@ -282,3 +284,5 @@ Five tests in `tests/api/test_known_failures.py` are marked `xfail(strict=True)`
 | `/orders/<id>` | Order detail |
 
 All interactive elements carry `data-testid` attributes for stable Selenium locators.
+
+![MarketFlow UI](docs/image/system-image.png)
