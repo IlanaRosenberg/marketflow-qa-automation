@@ -3,6 +3,8 @@
 A full-stack mini marketplace built specifically for QA Automation practice.
 Demonstrates professional QA engineering skills: API testing, UI testing (Selenium + Page Object Model), integration testing, Allure reports, Swagger docs, and Postman collections.
 
+[![Allure Report](https://img.shields.io/badge/Allure%20Report-Live-brightgreen?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiAyQzYuNDggMiAyIDYuNDggMiAxMnM0LjQ4IDEwIDEwIDEwIDEwLTQuNDggMTAtMTBTMTcuNTIgMiAxMiAyem0tMiAxNWwtNS01IDEuNDEtMS40MUwxMCAxNC4xN2w3LjU5LTcuNTlMMTkgOGwtOSA5eiIvPjwvc3ZnPg==)](https://ilanarosenberg.github.io/marketflow-qa-automation)
+
 ---
 
 ## Tech Stack
@@ -209,7 +211,7 @@ allure open allure-report
 | **Features / Stories** | Tests grouped by `@allure.feature` / `@allure.story` (e.g. Authentication → Login) |
 | **Severity** | Blocker · Critical · Normal · Minor per test |
 | **Behaviors** | Full user-story traceability view |
-| **XFAIL (broken)** | BUG-001, BUG-002, BUG-003 — open bugs visible on the dashboard |
+| **XFAIL (broken)** | BUG-001 → BUG-005 — open bugs visible on the dashboard as expected failures |
 | **Timeline** | Execution order and duration per test |
 
 ![Allure Report](docs/image/allure-report.png)
