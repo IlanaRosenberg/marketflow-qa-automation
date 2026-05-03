@@ -1,0 +1,17 @@
+Status: 201
+
+{
+  "data": {
+    "category": null,
+    "created_at": "2026-05-03T11:44:23.686145",
+    "description": null,
+    "id": 21,
+    "image_url": null,
+    "name": "Accidentally Free Product",
+    "price": 0.0,
+    "sku": "FREE-BUG-005",
+    "stock_quantity": 10
+  },
+  "error": null,
+  "success": true
+}

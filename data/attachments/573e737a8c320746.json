@@ -1,0 +1,11 @@
+Status: 200
+
+{
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE3Nzc4MTIyNDQsImlhdCI6MTc3NzgwODY0NH0.cWrLgMSooVBD3MuBMINh-vnxW0IcQkS12y3JPwikf6g",
+    "user_id": 1,
+    "username": "testuser1"
+  },
+  "error": null,
+  "success": true
+}

@@ -1,0 +1,21 @@
+Status: 200
+
+{
+  "data": {
+    "item_count": 1,
+    "items": [
+      {
+        "id": 1,
+        "product_id": 1,
+        "product_name": "Laptop Pro",
+        "product_price": 1299.99,
+        "product_sku": "LAPTOP-001",
+        "quantity": 2,
+        "subtotal": 2599.98
+      }
+    ],
+    "total_price": 2599.98
+  },
+  "error": null,
+  "success": true
+}

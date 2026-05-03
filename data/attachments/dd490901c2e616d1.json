@@ -1,0 +1,7 @@
+Status: 400
+
+{
+  "data": null,
+  "error": "Valid email is required",
+  "success": false
+}

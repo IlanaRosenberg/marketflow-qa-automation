@@ -1,0 +1,7 @@
+Status: 400
+
+{
+  "data": null,
+  "error": "Email is required",
+  "success": false
+}

@@ -1,0 +1,11 @@
+Status: 201
+
+{
+  "data": {
+    "email": "new@example.com",
+    "id": 3,
+    "username": "newuser"
+  },
+  "error": null,
+  "success": true
+}

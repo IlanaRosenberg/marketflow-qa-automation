@@ -1,0 +1,7 @@
+Status: 400
+
+{
+  "data": null,
+  "error": "Password must be at least 6 characters",
+  "success": false
+}
